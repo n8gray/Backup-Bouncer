@@ -12,6 +12,13 @@ for f in $testfiles; do
     tests="$tests $tst"
 done
 
+copyfiles=`ls copiers.d/*.cp`
+copiers=''
+for f in $copyfiles; do
+    cpf=`basename -s .cp $f`
+    copiers="$copiers $cpf"
+done
+
 create-vol () {
     hdiutil create -megabytes 10 -fs 'Journaled HFS+' \
             -volname $1 -type SPARSE -attach ./$1.dmg
@@ -65,31 +72,35 @@ compare-all () {
     done
 }
 
-copy () {
-    if [ -x copiers.d/$1 ]; then
-        # Make sure there's no trailing /
-        src="`dirname $2`/`basename $2`"
-        dst="`dirname $3`/`basename $3`"
-        mkdir $dst/$1
-        copy-runner copiers.d/$1 $src $dst/$1
-    else
-        echo "Can't execute copiers.d/$1"
-        echo "   File doesn't exist or isn't executable."
-        exit 1
-    fi
+copy-all () {
+    # Make sure there's no trailing /
+    #echo "arg2 = $2"
+    #echo "arg3 = $3"
+    src="`dirname $1`/`basename $1`"
+    dst="`dirname $2`/`basename $2`"
+    echo "src = $src"
+    echo "dst = $dst"
+    for c in $copiers; do
+        cnice=${c:3}
+        printf "Copying with: %${printWidth}s ..." "$cnice"
+        mkdir $dst/$c
+        bash copy-runner copiers.d/$c.cp $src $dst/$c \
+            && echo " ok" \
+            || echo " FAIL"
+    done
 }
 
 case $1 in
     create-all|create-vol|clean-all)
         $1 $2
     ;;
-    verify-all|compare-all|copy)
-        $1 $2 $3
+    verify-all|compare-all|copy-all)
+        $1 $2 $3 $4
     ;;
     *)
         echo "Ops: "
         echo "   create-vol, create-all, verify-all, "
-        echo "   compare-all, clean-all, copy"
+        echo "   compare-all, clean-all, copy-all"
         exit 1
     ;;
 esac

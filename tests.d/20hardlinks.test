@@ -16,8 +16,8 @@ verify () {
     stat -f "%i" link1 > $tmpfile
     stat -f "%i" link2 >> $tmpfile
     stat -f "%i" link3 >> $tmpfile
-    test "`uniq $tmpfile | wc -l`" = "1"
-    cat link3 | grep '^testing 1 2 3$'
+    test "`uniq $tmpfile | wc -l | awk '{print $1}'`" = "1"
+    cat link3 | grep '^testing 1 2 3$' > /dev/null
 }
 
 clean () {
