@@ -1,0 +1,49 @@
+#!/bin/bash -x
+
+# Args:
+#   $1: a new directory where you should create your files
+create () {
+    cd $1
+    echo "testing 1 2 3" > some-file
+    ln -s ./some-file symlink1
+    ln -s ./some-file symlink2
+    ln -s ./symlink1 symlink3
+}
+
+# Args:
+#   $1: the copied directory
+#   $2: the original directory (where create was run)
+#
+# This should fail if it detects that the copy was not faithful.
+verify () {
+    cd $1
+    set -e
+    test -L symlink1
+    test -L symlink2
+    test -L symlink3
+    cat symlink3 | grep -q '^testing 1 2 3$'
+}
+
+# Args: none
+# Treating the working directory as though your create function had been 
+# run there, perform any necessary operations to allow 'rm -rf' to succeed.
+# For example, unlock any locked files.
+clean () { 
+    true 
+}
+
+# Args:
+#   $1 & $2: Two files.  You should fail if the property of interest differs
+#            between them.  For example, if you are testing permissions, 
+#            compare should fail if the files have different permissions.
+#
+# Note: You should NOT assume that this file was produced by your create
+#   function.  This should be a general test.  You should be able to handle
+#   files that don't posess the property of interest at all without failing.
+#   You should also do your best to only test a single property (or group
+#   of properties) so that the meaning of a failure is clear.
+compare () {
+    set -e
+    test "`stat -f '%HT' $1`" = "`stat -f '%HT' $2`"
+    test "`stat -f '%Y' $1`" = "`stat -f '%Y' $2`"
+}

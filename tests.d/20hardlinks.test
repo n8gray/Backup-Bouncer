@@ -1,0 +1,33 @@
+#!/bin/sh
+
+create () {
+    cd $1
+    echo "testing 1 2 3" > some-file
+    ln ./some-file link1
+    ln ./some-file link2
+    ln ./link1 link3
+}
+
+
+verify () {
+    cd $1
+    tmpfile=/tmp/hardlinks-test
+    set -e
+    stat -f "%i" link1 > $tmpfile
+    stat -f "%i" link2 >> $tmpfile
+    stat -f "%i" link3 >> $tmpfile
+    test "`uniq $tmpfile | wc -l`" = "1"
+    cat link3 | grep '^testing 1 2 3$'
+}
+
+clean () {
+    true
+}
+
+# This is a hard test to do.  You want to make sure the same paths are linked
+# to the file, but there's no easy way to test that.  Instead, just check that
+# the link count is the same.  Not great, but oh well.
+compare () {
+    set -e
+    test "`stat -f '%l' $1`" = "`stat -f '%l' $2`"
+}

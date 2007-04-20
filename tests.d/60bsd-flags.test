@@ -1,0 +1,50 @@
+#!/bin/sh
+#
+# I'm not sure what the semantics of most of these are.  From man chflags:
+#     The flags are specified as an octal number or a comma separated list of
+#     keywords.  The following keywords are currently defined:
+#
+#           arch    set the archived flag (super-user only)
+#           opaque  set the opaque flag (owner or super-user only)
+#           nodump  set the nodump flag (owner or super-user only)
+#           sappnd  set the system append-only flag (super-user only)
+#           schg    set the system immutable flag (super-user only)
+#           sunlnk  set the system undeletable flag (super-user only)
+#           uappnd  set the user append-only flag (owner or super-user only)
+#           uchg    set the user immutable flag (owner or super-user only)
+#           uunlnk  set the user undeletable flag (owner or super-user only)
+#           archived, sappend, schange, simmutable, uappend, uchange,
+#                   uimmutable, sunlink, uunlink
+#                   aliases for the above
+#
+
+
+create () {
+    cd $1
+    set -e
+    
+    mkdir dir-with-flags
+    chflags opaque,nodump,uappnd dir-with-flags
+    
+    touch file-with-flags
+    chflags opaque,nodump,uappnd file-with-flags
+    
+}
+
+compare () {
+    set -e
+    test "`/bin/ls -lo $1 | awk '{print $5}'`" = \
+         "`/bin/ls -lo $2 | awk '{print $5}'`"
+}
+
+verify () {
+    cd $1
+    set -e
+    compare ./dir-with-flags $2/dir-with-flags
+    compare ./file-with-flags $2/file-with-flags
+}
+
+clean () {
+    chflags 0 dir-with-flags
+    chflags 0 file-with-flags
+}

@@ -1,0 +1,87 @@
+#!/bin/sh
+# There are a ton of these finder flags, and I'm not sure what the semantics are
+# for many of them.  So we don't test them all.  Here's the SetFile help page:
+#
+# Usage: SetFile [option...] file...
+#     -a attributes   # attributes (lowercase = 0, uppercase = 1)*
+#     -c creator      # file creator
+#     -d date         # creation date (mm/dd/[yy]yy [hh:mm[:ss] [AM | PM]])*
+#     -m date         # modification date (mm/dd/[yy]yy [hh:mm[:ss] [AM | PM]])*
+#         -P          # perform action on symlink instead of following it
+#     -t type         # file type
+# 
+#     Note: The following attributes may be used with the -a option:
+#         A   Alias file
+#         B   Bundle
+#         C   Custom icon*
+#         D   Desktop*
+#         E   Hidden extension*
+#         I   Inited*
+#         M   Shared (can run multiple times)
+#         N   No INIT resources
+#         L   Locked
+#         S   System (name locked)
+#         T   Stationery
+#         V   Invisible*
+#         Z   Busy*
+# 
+#     Note: Items marked with an asterisk (*) are allowed with folders
+#     Note: Period (.) represents the current date and time.
+#     Note: [yy]yy < 100 assumes 21th century, e.g. 20yy
+#
+#
+# So what does it mean to assign the A attribute to some random file?
+#
+# Setting C (custom icon) on a folder means the finder will use the Icon^M file
+# inside that folder as its icon.
+
+create () {
+    cd $1
+    set -e
+    
+    touch type-and-creator
+    SetFile -c MSWD -t TEXT type-and-creator
+    
+    mkdir bundle-dir
+    touch bundle-dir/stuff
+    SetFile -a B bundle-dir
+    
+    mkdir invisible-dir
+    SetFile -a V invisible-dir
+    
+    touch locked-file
+    SetFile -a L locked-file
+    
+    touch hidden-extension.txt
+    SetFile -a E hidden-extension.txt
+    
+    touch system-file
+    SetFile -a S system-file
+}
+
+
+verify () {
+    cd $1
+    set -e
+    
+    test "`GetFileInfo -t type-and-creator`" = '"TEXT"'
+    test "`GetFileInfo -c type-and-creator`" = '"MSWD"'
+    
+    test "`GetFileInfo -ab bundle-dir`" = "1"
+    test "`GetFileInfo -av invisible-dir`" = "1"
+    test "`GetFileInfo -al locked-file`" = "1"
+    test "`GetFileInfo -ae hidden-extension.txt`" = "1"
+    test "`GetFileInfo -as system-file`" = "1"
+}
+
+clean () {
+    SetFile -a l locked-file
+}
+
+compare () {
+    set -e
+    test "`GetFileInfo -P -a $1`" = "`GetFileInfo -P -a $2`"
+    test "`GetFileInfo -P -t $1`" = "`GetFileInfo -P -t $2`"
+    test "`GetFileInfo -P -c $1`" = "`GetFileInfo -P -c $2`"
+    test "`GetFileInfo -P -m $1`" = "`GetFileInfo -P -m $2`"
+}

@@ -1,0 +1,66 @@
+#!/bin/bash
+
+testfiles=`ls tests.d/*.test`
+tests=''
+for f in $testfiles; do
+    tst=`basename -s .test $f`
+    tests="$tests $tst"
+done
+
+create-vol () {
+    hdiutil create -megabytes 10 -fs 'Journaled HFS+' \
+            -volname $1 -attach ./$1.dmg
+    sudo fsaclctl -p /Volumes/CopyFrom -e
+}
+
+create-all () {
+    for t in $tests; do
+        echo "Creating: $t"
+        if [ -d "$1/$t" ]; then
+            bash test-runner tests.d/$t.test clean $1/$t || true
+            rm -Rf "$1/$t" || true
+        fi
+        mkdir $1/$t
+        bash test-runner tests.d/$t.test create $1/$t || echo FAIL
+    done
+}
+
+clean-all () {
+    for t in $tests; do
+        echo "Cleaning: $t"
+        if [ -d "$1/$t" ]; then
+            bash test-runner tests.d/$t.test clean $1/$t || true
+            rm -Rf "$1/$t" || true
+        fi
+    done
+}
+
+verify-all () {
+    for t in $tests; do
+        echo -n "Verifying: $t..."
+        bash test-runner tests.d/$t.test verify $2/$t $1/$t \
+            && echo " ok" \
+            || echo " FAIL"
+    done
+}
+
+compare-all () {
+    for t in $tests; do
+        echo "Comparing: $t"
+        find $1 -exec bash test-runner tests.d/$t.test compare $1/\{\} $2/\{\} \; || echo FAIL
+    done
+}
+
+case $1 in
+    create-all|create-vol|clean-all)
+        $1 $2
+    ;;
+    verify-all|compare-all)
+        $1 $2 $3
+    ;;
+    *)
+        echo "Ops: "
+        echo "   create-vol, create-all, verify-all, compare-all, clean-all"
+        exit 1
+    ;;
+esac

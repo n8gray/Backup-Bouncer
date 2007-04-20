@@ -1,0 +1,28 @@
+#!/bin/sh
+
+create () {
+    cd $1
+    set -e
+    
+    touch 'acl-test'
+    chmod +a "www allow read" acl-test
+    chmod +a "nobody allow read" acl-test
+}
+
+compare () {
+    set -e
+    
+    test "`ls -le $1 | tail -n +2`" = "`ls -le $1 | tail -n +2`"
+}
+
+
+verify () {
+    cd $1
+    set -e
+    
+    compare $2/acl-test ./acl-test
+}
+
+clean () {
+    true
+}

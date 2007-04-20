@@ -1,0 +1,30 @@
+#!/bin/sh
+
+create () {
+    cd $1
+    set -e
+    echo "testing 1 2 3" > some-file
+    echo "Hello world" > some-file/rsrc
+}
+
+
+verify () {
+    cd $1
+    set -e
+    grep -q '^testing 1 2 3$' some-file
+    grep -q '^Hello world$' some-file/rsrc
+}
+
+clean () {
+    true
+}
+
+compare () {
+    set -e
+    # We only test regular files.  Should we test others?
+    if [ -f "$1" ]; then
+        cmp "$1/rsrc" "$2/rsrc"
+    else
+        true
+    fi
+}

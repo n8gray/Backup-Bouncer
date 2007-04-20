@@ -1,0 +1,26 @@
+#!/bin/sh
+#
+# There are no tools included with OS X to manipulate extended attributes from
+# the command line.
+
+create () {
+    cd $1
+    set -e
+    
+    #touch 'xattr-test'
+    
+}
+
+
+verify () {
+    cd $1
+    set -e
+}
+
+clean () {
+    true
+}
+
+compare () {
+    set -e
+}
