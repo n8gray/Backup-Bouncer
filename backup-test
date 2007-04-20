@@ -3,6 +3,8 @@
 scriptdir=`dirname $0`
 cd $scriptdir
 
+printWidth=20
+
 testfiles=`ls tests.d/*.test`
 tests=''
 for f in $testfiles; do
@@ -18,7 +20,8 @@ create-vol () {
 
 create-all () {
     for t in $tests; do
-        echo "Creating: $t"
+        tnice=${t:2}
+        printf "Creating: %${printWidth}s ..." "$tnice"
         if [ -d "$1/$t" ]; then
             bash test-runner tests.d/$t.test clean $1/$t || true
             rm -Rf "$1/$t" || true
@@ -30,7 +33,8 @@ create-all () {
 
 clean-all () {
     for t in $tests; do
-        echo "Cleaning: $t"
+        tnice=${t:2}
+        printf "Cleaning: %${printWidth}s ..." "$tnice"
         if [ -d "$1/$t" ]; then
             bash test-runner tests.d/$t.test clean $1/$t || true
             rm -Rf "$1/$t" || true
@@ -40,17 +44,22 @@ clean-all () {
 
 verify-all () {
     for t in $tests; do
-        echo -n "Verifying: $t..."
+        tnice=${t:2}
+        printf "Verifying: %${printWidth}s ..." "$tnice"
         bash test-runner tests.d/$t.test verify $2/$t $1/$t \
             && echo " ok" \
             || echo " FAIL"
     done
 }
 
+# Compare a single pair of files for all known properties.
 compare-all () {
     for t in $tests; do
-        echo "Comparing: $t"
-        find $1 -exec bash test-runner tests.d/$t.test compare $1/\{\} $2/\{\} \; || echo FAIL
+        tnice=${t:2}
+        echo -n "Comparing: %${printWidth}s ..." "$tnice"
+        bash test-runner tests.d/$t.test compare $1 $2 \
+            && echo " ok" \
+            || echo " FAIL"
     done
 }
 
