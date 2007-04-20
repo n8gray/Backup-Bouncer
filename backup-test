@@ -1,5 +1,8 @@
 #!/bin/bash
 
+scriptdir=`dirname $0`
+cd $scriptdir
+
 testfiles=`ls tests.d/*.test`
 tests=''
 for f in $testfiles; do
@@ -9,7 +12,7 @@ done
 
 create-vol () {
     hdiutil create -megabytes 10 -fs 'Journaled HFS+' \
-            -volname $1 -attach ./$1.dmg
+            -volname $1 -type SPARSE -attach ./$1.dmg
     sudo fsaclctl -p /Volumes/CopyFrom -e
 }
 
