@@ -1,0 +1,24 @@
+#!/bin/sh
+
+create () {
+    cd $1
+    set -e
+    
+    mkfifo some-fifo
+}
+
+compare () {
+    set -e
+    test "`stat -f '%HT' $1`" = "`stat -f '%HT' $2`"
+}
+
+verify () {
+    cd $1
+    set -e
+    
+    compare ./some-fifo $2/some-fifo
+}
+
+clean () {
+    true
+}

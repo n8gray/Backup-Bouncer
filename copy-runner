@@ -1,0 +1,12 @@
+#!/bin/bash
+
+copier=$1
+src=$2
+dst=$3
+
+source $copier
+
+uname -a > $dst/meta
+echo $copier >> $dst/meta
+version >> $dst/meta
+backup $src $dst

@@ -27,14 +27,16 @@ create-all () {
             rm -Rf "$1/$t" || true
         fi
         mkdir $1/$t
-        bash test-runner tests.d/$t.test create $1/$t || echo FAIL
+        bash test-runner tests.d/$t.test create $1/$t \
+            && echo " ok" \
+            || echo " FAIL"
     done
 }
 
 clean-all () {
     for t in $tests; do
         tnice=${t:2}
-        printf "Cleaning: %${printWidth}s ..." "$tnice"
+        printf "Cleaning: %${printWidth}s\n" "$tnice"
         if [ -d "$1/$t" ]; then
             bash test-runner tests.d/$t.test clean $1/$t || true
             rm -Rf "$1/$t" || true
@@ -63,16 +65,31 @@ compare-all () {
     done
 }
 
+copy () {
+    if [ -x copiers.d/$1 ]; then
+        # Make sure there's no trailing /
+        src="`dirname $2`/`basename $2`"
+        dst="`dirname $3`/`basename $3`"
+        mkdir $dst/$1
+        copy-runner copiers.d/$1 $src $dst/$1
+    else
+        echo "Can't execute copiers.d/$1"
+        echo "   File doesn't exist or isn't executable."
+        exit 1
+    fi
+}
+
 case $1 in
     create-all|create-vol|clean-all)
         $1 $2
     ;;
-    verify-all|compare-all)
+    verify-all|compare-all|copy)
         $1 $2 $3
     ;;
     *)
         echo "Ops: "
-        echo "   create-vol, create-all, verify-all, compare-all, clean-all"
+        echo "   create-vol, create-all, verify-all, "
+        echo "   compare-all, clean-all, copy"
         exit 1
     ;;
 esac
