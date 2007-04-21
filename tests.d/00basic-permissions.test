@@ -1,0 +1,60 @@
+#!/bin/bash -x
+
+# Args:
+#   $1: a new directory where you should create your files
+create () {
+    cd $1
+    
+    touch owned-by-me
+    chmod 1777 owned-by-me
+    
+    touch owned-by-root
+    chown root:wheel owned-by-root
+    
+    touch owned-by-www
+    chown www:www owned-by-www
+    
+    mkdir some-dir
+    chmod 1777 some-dir
+    
+}
+
+# Args:
+#   $1 & $2: Two files.  You should fail if the property of interest differs
+#            between them.  For example, if you are testing permissions, 
+#            compare should fail if the files have different permissions.
+#
+# Note: You should NOT assume that this file was produced by your create
+#   function.  This should be a general test.  You should be able to handle
+#   files that don't posess the property of interest at all without failing.
+#   You should also do your best to only test a single property (or group
+#   of properties) so that the meaning of a failure is clear.
+compare () {
+    set -e
+    test -e $1
+    test -e $2
+    test "`stat -f '%u:%g:%p' $1`" = "`stat -f '%u:%g:%p' $2`"
+}
+
+# Args:
+#   $1: the copied directory
+#   $2: the original directory (where create was run)
+#
+# This should fail if it detects that the copy was not faithful.
+verify () {
+    cd $1
+    set -e
+
+    compare ./owned-by-me $2/owned-by-me
+    compare ./owned-by-root $2/owned-by-root
+    compare ./owned-by-www $2/owned-by-www
+    compare ./some-dir $2/some-dir
+}
+
+# Args: none
+# Treating the working directory as though your create function had been 
+# run there, perform any necessary operations to allow 'rm -rf' to succeed.
+# For example, unlock any locked files.
+clean () { 
+    true 
+}

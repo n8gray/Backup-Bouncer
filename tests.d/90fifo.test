@@ -16,6 +16,7 @@ verify () {
     cd $1
     set -e
     
+    test -p ./some-fifo
     compare ./some-fifo $2/some-fifo
 }
 

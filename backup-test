@@ -20,23 +20,23 @@ for f in $copyfiles; do
 done
 
 create-vol () {
-    hdiutil create -megabytes 10 -fs 'Journaled HFS+' \
+    hdiutil create -size 40m -fs 'Journaled HFS+' \
             -volname $1 -type SPARSE -attach ./$1.dmg
-    sudo fsaclctl -p /Volumes/CopyFrom -e
+    sudo fsaclctl -p /Volumes/$1 -e
 }
 
 create-all () {
     for t in $tests; do
         tnice=${t:2}
-        printf "Creating: %${printWidth}s ..." "$tnice"
+        printf "Creating: %${printWidth}s ... " "$tnice"
         if [ -d "$1/$t" ]; then
             bash test-runner tests.d/$t.test clean $1/$t || true
             rm -Rf "$1/$t" || true
         fi
         mkdir $1/$t
         bash test-runner tests.d/$t.test create $1/$t \
-            && echo " ok" \
-            || echo " FAIL"
+            && echo ok \
+            || echo FAIL
     done
 }
 
@@ -54,10 +54,10 @@ clean-all () {
 verify-all () {
     for t in $tests; do
         tnice=${t:2}
-        printf "Verifying: %${printWidth}s ..." "$tnice"
+        printf "Verifying: %${printWidth}s ... " "$tnice"
         bash test-runner tests.d/$t.test verify $2/$t $1/$t \
-            && echo " ok" \
-            || echo " FAIL"
+            && echo ok \
+            || echo FAIL
     done
 }
 
@@ -65,28 +65,34 @@ verify-all () {
 compare-all () {
     for t in $tests; do
         tnice=${t:2}
-        echo -n "Comparing: %${printWidth}s ..." "$tnice"
+        echo -n "Comparing: %${printWidth}s ... " "$tnice"
         bash test-runner tests.d/$t.test compare $1 $2 \
-            && echo " ok" \
-            || echo " FAIL"
+            && echo ok \
+            || echo FAIL
     done
 }
 
 copy-all () {
     # Make sure there's no trailing /
-    #echo "arg2 = $2"
-    #echo "arg3 = $3"
     src="`dirname $1`/`basename $1`"
     dst="`dirname $2`/`basename $2`"
     echo "src = $src"
     echo "dst = $dst"
     for c in $copiers; do
+        clean-all $dst/$c
+        rm -rf $dst/$c
         cnice=${c:3}
-        printf "Copying with: %${printWidth}s ..." "$cnice"
+        printf "Copying with: %${printWidth}s ... " "$cnice"
         mkdir $dst/$c
         bash copy-runner copiers.d/$c.cp $src $dst/$c \
-            && echo " ok" \
-            || echo " FAIL"
+            && echo ok \
+            || echo FAIL
+    done
+    for c in $copiers; do
+        cnice=${c:3}
+        echo "Verifying: $cnice"
+        verify-all $src $dst/$c
+        echo
     done
 }
 
@@ -95,7 +101,7 @@ case $1 in
         $1 $2
     ;;
     verify-all|compare-all|copy-all)
-        $1 $2 $3 $4
+        $1 $2 $3
     ;;
     *)
         echo "Ops: "

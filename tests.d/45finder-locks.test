@@ -1,0 +1,27 @@
+#!/bin/sh
+#
+# It looks like many techniques preserve most finder flags but not locks, so we
+# test them separately.
+
+create () {
+    cd $1
+    set -e
+    touch 'locked-file'
+    SetFile -a L locked-file
+}
+
+
+verify () {
+    cd $1
+    set -e
+    test "`GetFileInfo -al ./locked-file`" = "1"
+}
+
+clean () {
+    SetFile -a l locked-file
+}
+
+compare () {
+    set -e
+    test "`GetFileInfo -P -al $1`" = "`GetFileInfo -P -al $2`"
+}

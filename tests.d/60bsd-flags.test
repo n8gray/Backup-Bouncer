@@ -4,30 +4,38 @@
 #     The flags are specified as an octal number or a comma separated list of
 #     keywords.  The following keywords are currently defined:
 #
-#           arch    set the archived flag (super-user only)
 #           opaque  set the opaque flag (owner or super-user only)
 #           nodump  set the nodump flag (owner or super-user only)
-#           sappnd  set the system append-only flag (super-user only)
-#           schg    set the system immutable flag (super-user only)
-#           sunlnk  set the system undeletable flag (super-user only)
 #           uappnd  set the user append-only flag (owner or super-user only)
 #           uchg    set the user immutable flag (owner or super-user only)
 #           uunlnk  set the user undeletable flag (owner or super-user only)
+#
+#           arch    set the archived flag (super-user only)
+#           sappnd  set the system append-only flag (super-user only)
+#           schg    set the system immutable flag (super-user only)
+#           sunlnk  set the system undeletable flag (super-user only)
+#           
 #           archived, sappend, schange, simmutable, uappend, uchange,
 #                   uimmutable, sunlink, uunlink
 #                   aliases for the above
 #
-
+# Note to self: If you set the schg (system immutable) flag, then you
+# can't un-set it without rebooting into single-user mode!  I think the
+# same also applies to the other system-level flags.  Yes, I learned this
+# the hard way...
+#   http://www.freebsd.org/cgi/man.cgi?query=chflags&sektion=2
+#
+# Also, the uunlnk (and sunlnk) flags don't seem to work.
 
 create () {
     cd $1
     set -e
     
     mkdir dir-with-flags
-    chflags opaque,nodump,uappnd dir-with-flags
+    chflags uappnd,uchg,nodump,opaque dir-with-flags
     
     touch file-with-flags
-    chflags opaque,nodump,uappnd file-with-flags
+    chflags uappnd,uchg,nodump,opaque file-with-flags
     
 }
 

@@ -7,5 +7,5 @@ version () {
 }
 
 backup () {
-    $rsync $flags $1/ $2
+    sudo $rsync $flags $1/ $2
 }

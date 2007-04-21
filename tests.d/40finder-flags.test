@@ -1,6 +1,6 @@
 #!/bin/sh
 # There are a ton of these finder flags, and I'm not sure what the semantics are
-# for many of them.  So we don't test them all.  Here's the SetFile help page:
+# for many of them.  Here's the SetFile help page:
 #
 # Usage: SetFile [option...] file...
 #     -a attributes   # attributes (lowercase = 0, uppercase = 1)*
@@ -34,6 +34,9 @@
 #
 # Setting C (custom icon) on a folder means the finder will use the Icon^M file
 # inside that folder as its icon.
+#
+# I suppose the semantics don't really matter.  We just want to know if the
+# flags are preserved.
 
 create () {
     cd $1
@@ -48,17 +51,29 @@ create () {
     
     mkdir invisible-dir
     SetFile -a V invisible-dir
-    
-    touch locked-file
-    SetFile -a L locked-file
-    
+        
     touch hidden-extension.txt
     SetFile -a E hidden-extension.txt
     
     touch system-file
     SetFile -a S system-file
+    
+    # Use every flag possible (except lock)
+    touch mucho-flags-file
+    SetFile -a ABCDEIMNSTVZ mucho-flags-file
+    
+    # All possible on a dir
+    touch mucho-flags-dir
+    SetFile -a CDEIVZ mucho-flags-dir
 }
 
+compare () {
+    set -e
+    test "`GetFileInfo -P -a $1`" = "`GetFileInfo -P -a $2`"
+    test "`GetFileInfo -P -t $1`" = "`GetFileInfo -P -t $2`"
+    test "`GetFileInfo -P -c $1`" = "`GetFileInfo -P -c $2`"
+    test "`GetFileInfo -P -m $1`" = "`GetFileInfo -P -m $2`"
+}
 
 verify () {
     cd $1
@@ -69,19 +84,12 @@ verify () {
     
     test "`GetFileInfo -ab bundle-dir`" = "1"
     test "`GetFileInfo -av invisible-dir`" = "1"
-    test "`GetFileInfo -al locked-file`" = "1"
     test "`GetFileInfo -ae hidden-extension.txt`" = "1"
     test "`GetFileInfo -as system-file`" = "1"
+    compare ./mucho-flags-file $2/mucho-flags-file
+    compare ./mucho-flags-dir $2/mucho-flags-dir
 }
 
 clean () {
-    SetFile -a l locked-file
-}
-
-compare () {
-    set -e
-    test "`GetFileInfo -P -a $1`" = "`GetFileInfo -P -a $2`"
-    test "`GetFileInfo -P -t $1`" = "`GetFileInfo -P -t $2`"
-    test "`GetFileInfo -P -c $1`" = "`GetFileInfo -P -c $2`"
-    test "`GetFileInfo -P -m $1`" = "`GetFileInfo -P -m $2`"
+    true
 }
