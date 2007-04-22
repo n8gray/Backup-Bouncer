@@ -2,8 +2,9 @@
 
 scriptdir=`dirname $0`
 cd $scriptdir
+export PATH="`pwd`/util:$PATH"
 
-printWidth=20
+export printWidth=20
 
 testfiles=`ls tests.d/*.test`
 tests=''
@@ -21,11 +22,12 @@ done
 
 create-vol () {
     hdiutil create -size 40m -fs 'Journaled HFS+' \
-            -volname $1 -type SPARSE -attach ./$1.dmg
+            -volname $1 -type SPARSE ./$1
+    hdiutil attach -owners on ./$1.sparseimage
     sudo fsaclctl -p /Volumes/$1 -e
 }
 
-create-all () {
+create () {
     for t in $tests; do
         tnice=${t:2}
         printf "Creating: %${printWidth}s ... " "$tnice"
@@ -40,7 +42,7 @@ create-all () {
     done
 }
 
-clean-all () {
+clean () {
     for t in $tests; do
         tnice=${t:2}
         printf "Cleaning: %${printWidth}s\n" "$tnice"
@@ -51,7 +53,7 @@ clean-all () {
     done
 }
 
-verify-all () {
+verify () {
     for t in $tests; do
         tnice=${t:2}
         printf "Verifying: %${printWidth}s ... " "$tnice"
@@ -62,7 +64,7 @@ verify-all () {
 }
 
 # Compare a single pair of files for all known properties.
-compare-all () {
+compare () {
     for t in $tests; do
         tnice=${t:2}
         echo -n "Comparing: %${printWidth}s ... " "$tnice"
@@ -72,15 +74,20 @@ compare-all () {
     done
 }
 
-copy-all () {
+copy () {
     # Make sure there's no trailing /
     src="`dirname $1`/`basename $1`"
     dst="`dirname $2`/`basename $2`"
     echo "src = $src"
     echo "dst = $dst"
+    echo -n Cleaning
     for c in $copiers; do
-        clean-all $dst/$c
+        echo -n .
+        clean $dst/$c > /dev/null
         rm -rf $dst/$c
+    done
+    echo
+    for c in $copiers; do
         cnice=${c:3}
         printf "Copying with: %${printWidth}s ... " "$cnice"
         mkdir $dst/$c
@@ -90,23 +97,72 @@ copy-all () {
     done
     for c in $copiers; do
         cnice=${c:3}
-        echo "Verifying: $cnice"
-        verify-all $src $dst/$c
         echo
+        echo "------------------ $cnice ------------------"
+        if [ -e $dst/$c/skipped ]; then
+            echo "    This test was skipped"
+        else
+            verify $src $dst/$c
+        fi
     done
 }
 
 case $1 in
-    create-all|create-vol|clean-all)
+    create|create-vol|clean)
         $1 $2
     ;;
-    verify-all|compare-all|copy-all)
+    compare)
         $1 $2 $3
     ;;
+    verify|copy)
+        if [ "$2" = "detail" ]; then
+            export DETAIL=1
+            $1 $3 $4
+        else
+            $1 $2 $3
+        fi
+    ;;
     *)
-        echo "Ops: "
-        echo "   create-vol, create-all, verify-all, "
-        echo "   compare-all, clean-all, copy-all"
+        echo "Usage: 
+        $0 create-vol volname
+                Create and mount a disk image suitable for testing.
+                
+        $0 create dir
+                Populate dir with test files/directories.
+                
+        $0 copy [detail] srcdir dstdir
+                For each copier, copy from srcdir to dstdir/copier-name,
+                then verify each copy.
+        
+        $0 verify [detail] srcdir dstdir
+                Test the validity of the files in dstdir, which should be
+                copies of those in srcdir.  srcdir should contain a directory
+                created by '$0 create srcdir'
+                
+        $0 compare srcfile dstfile
+                Test the two files for equality based on all tests in the
+                test suite.
+        
+        $0 clean dir
+                Remove all test files from dir.  For various reasons, 
+                simply running 'rm -rf dir' will not work.
+        
+        The typical usage will be something like:
+        1. Create files
+            $0 create-vol Src
+            $0 create-vol Dst
+            sudo $0 create /Volumes/Src
+        
+        2. Run test suite
+            $0 copy detail /Volumes/Src /Volumes/Dst
+            # That filled /Volumes/Dst with a subdirectory for each copier.
+            # To verify the results from a single copy again:
+            $0 verify detail /Volumes/Src /Volumes/Dst/10-rsync-apple
+            
+        3. Or maybe you want to test a GUI copier
+            # Use SuperDuper! to copy to /Volumes/SDDst, then:
+            $0 verify detail /Volumes/Src /Volumes/SDDst
+        "
         exit 1
     ;;
 esac

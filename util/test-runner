@@ -1,0 +1,44 @@
+#!/bin/bash
+
+begin-subtests () {
+    [ -n "$DETAIL" ] && echo
+}
+
+subtest () {
+    if [ -n "$DETAIL" ]; then
+        printf "   Sub-test: %${printWidth}s ... " "$1"
+        if [ "$2" = "0" ]; then
+            echo ok
+        else
+            echo FAIL
+        fi
+    fi
+}
+
+alltrue () {
+    while [ -n "$1" ]; do
+        [ "$1" = "0" ] || return 1
+        shift
+    done
+    return 0
+}
+        
+source $1
+shift
+
+case $1 in
+    create)
+        $1 $2
+    ;;
+    clean)
+        cd $2
+        clean
+    ;;
+    compare|verify)
+        $1 $2 $3
+    ;;
+    *)
+        echo "Ops: create, verify, clean, compare"
+        exit 1
+    ;;
+esac

@@ -7,20 +7,49 @@ create () {
     cd $1
     set -e
     
-    #touch 'xattr-test'
+    touch xattr-test
+    xattr-util w message 'hello world' xattr-test
+    xattr-util w this.that 'the other' xattr-test
     
+    mkdir dir-with-xattrs
+    xattr-util w mamma.mia 'How about a nice pizza pie?' dir-with-xattrs
+    
+    ln -s ./xattr-test symlink-with-xattrs
+    xattr-util w good.grief 'yes, you can put these on symlinks too' \
+            symlink-with-xattrs
 }
 
+compare () {
+    test -e $1 && \
+        test -e $2 && \
+        test "`xattr-util l $1`" = "`xattr-util l $2`" \
+        || return 1
+    for a in `xattr-util l $1`; do
+        test "`xattr-util r $a $1`" = "`xattr-util r $a $2`" || return 1
+    done
+}
 
 verify () {
     cd $1
-    set -e
+    set +e
+    
+    begin-subtests
+    
+    compare ./xattr-test $2/xattr-test
+    x1=$?
+    subtest "on files" $x1
+    
+    compare ./dir-with-xattrs $2/dir-with-xattrs
+    x2=$?
+    subtest "on directories" $x2
+    
+    compare ./symlink-with-xattrs $2/symlink-with-xattrs
+    x3=$?
+    subtest "on symlinks" $x3
+    
+    alltrue $x1 $x2 $x3
 }
 
 clean () {
     true
-}
-
-compare () {
-    set -e
 }

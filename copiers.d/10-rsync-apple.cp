@@ -2,6 +2,10 @@ rsync=/usr/bin/rsync
 
 flags='-aH -E'
 
+can-copy () {
+    test -e $rsync
+}
+
 version () {
     $rsync --version
 }

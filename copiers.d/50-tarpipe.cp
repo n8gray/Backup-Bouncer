@@ -2,6 +2,10 @@ tar=/usr/bin/tar
 
 flags='-Rp'
 
+can-copy () {
+    test -e $tar
+}
+
 version () {
     $tar --version
 }
