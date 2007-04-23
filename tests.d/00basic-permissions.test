@@ -9,10 +9,10 @@ create () {
     chmod 1777 owned-by-me
     
     touch owned-by-root
-    chown root:wheel owned-by-root
+    sudo chown root:wheel owned-by-root
     
     touch owned-by-www
-    chown www:www owned-by-www
+    sudo chown www:www owned-by-www
     
     mkdir some-dir
     chmod 1777 some-dir

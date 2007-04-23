@@ -1,9 +1,5 @@
 #!/bin/bash
 
-if [ ! "`id -u`" = 0 ]; then
-    echo "Copying as a non-root user is not advised."
-fi
-
 copier=$1
 src=$2
 dst=$3

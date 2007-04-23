@@ -27,29 +27,26 @@ create-vol () {
     sudo fsaclctl -p /Volumes/$1 -e
 }
 
-create () {
-    for t in $tests; do
-        tnice=${t:2}
-        printf "Creating: %${printWidth}s ... " "$tnice"
-        if [ -d "$1/$t" ]; then
-            bash test-runner tests.d/$t.test clean $1/$t || true
-            rm -Rf "$1/$t" || true
-        fi
-        mkdir $1/$t
-        bash test-runner tests.d/$t.test create $1/$t \
-            && echo ok \
-            || echo FAIL
-    done
-}
-
 clean () {
     for t in $tests; do
         tnice=${t:2}
         printf "Cleaning: %${printWidth}s\n" "$tnice"
         if [ -d "$1/$t" ]; then
             bash test-runner tests.d/$t.test clean $1/$t || true
-            rm -Rf "$1/$t" || true
+            sudo rm -Rf "$1/$t" || true
         fi
+    done
+}
+
+create () {
+    clean $1
+    for t in $tests; do
+        tnice=${t:2}
+        printf "Creating: %${printWidth}s ... " "$tnice"
+        mkdir $1/$t
+        bash test-runner tests.d/$t.test create $1/$t \
+            && echo ok \
+            || echo FAIL
     done
 }
 
@@ -84,7 +81,7 @@ copy () {
     for c in $copiers; do
         echo -n .
         clean $dst/$c > /dev/null
-        rm -rf $dst/$c
+        sudo rm -Rf $dst/$c
     done
     echo
     for c in $copiers; do
@@ -147,13 +144,16 @@ case $1 in
                 Remove all test files from dir.  For various reasons, 
                 simply running 'rm -rf dir' will not work.
         
+        Note that many operations require elevated privileges, so you may be
+        prompted for your password.
+        
         The typical usage will be something like:
         1. Create files
             $0 create-vol Src
             $0 create-vol Dst
-            sudo $0 create /Volumes/Src
+            $0 create /Volumes/Src
         
-        2. Run test suite
+        2. Run test suite (as root!)
             $0 copy detail /Volumes/Src /Volumes/Dst
             # That filled /Volumes/Dst with a subdirectory for each copier.
             # To verify the results from a single copy again:
