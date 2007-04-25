@@ -32,7 +32,7 @@ clean () {
         tnice=${t:2}
         printf "Cleaning: %${printWidth}s\n" "$tnice"
         if [ -d "$1/$t" ]; then
-            bash test-runner tests.d/$t.test clean $1/$t || true
+            bash util/test-runner tests.d/$t.test clean $1/$t || true
             sudo rm -Rf "$1/$t" || true
         fi
     done
@@ -44,7 +44,7 @@ create () {
         tnice=${t:2}
         printf "Creating: %${printWidth}s ... " "$tnice"
         mkdir $1/$t
-        bash test-runner tests.d/$t.test create $1/$t \
+        bash util/test-runner tests.d/$t.test create $1/$t \
             && echo ok \
             || echo FAIL
     done
@@ -54,7 +54,7 @@ verify () {
     for t in $tests; do
         tnice=${t:2}
         printf "Verifying: %${printWidth}s ... " "$tnice"
-        bash test-runner tests.d/$t.test verify $2/$t $1/$t \
+        bash util/test-runner tests.d/$t.test verify $2/$t $1/$t \
             && echo ok \
             || echo FAIL
     done
@@ -64,8 +64,8 @@ verify () {
 compare () {
     for t in $tests; do
         tnice=${t:2}
-        echo -n "Comparing: %${printWidth}s ... " "$tnice"
-        bash test-runner tests.d/$t.test compare $1 $2 \
+        printf "Comparing: %${printWidth}s ... " "$tnice"
+        bash util/test-runner tests.d/$t.test compare $1 $2 \
             && echo ok \
             || echo FAIL
     done
@@ -77,6 +77,13 @@ copy () {
     dst="`dirname $2`/`basename $2`"
     echo "src = $src"
     echo "dst = $dst"
+    #echo Remounting with owners enabled
+    # This requires the actual mount point.
+    srcDisk=`stat -f "%Sd" $src`
+    dstDisk=`stat -f "%Sd" $dst`
+    echo Enabling owners on disks
+    sudo mount -uvo perm /dev/$srcDisk
+    sudo mount -uvo perm /dev/$dstDisk
     echo -n Cleaning
     for c in $copiers; do
         echo -n .
@@ -88,7 +95,7 @@ copy () {
         cnice=${c:3}
         printf "Copying with: %${printWidth}s ... " "$cnice"
         mkdir $dst/$c
-        bash copy-runner copiers.d/$c.cp $src $dst/$c \
+        bash util/copy-runner copiers.d/$c.cp $src $dst/$c \
             && echo ok \
             || echo FAIL
     done
@@ -97,7 +104,7 @@ copy () {
         echo
         echo "------------------ $cnice ------------------"
         if [ -e $dst/$c/skipped ]; then
-            echo "    This test was skipped"
+            echo "    This copier was skipped"
         else
             verify $src $dst/$c
         fi
@@ -134,7 +141,8 @@ case $1 in
         $0 verify [detail] srcdir dstdir
                 Test the validity of the files in dstdir, which should be
                 copies of those in srcdir.  srcdir should contain a directory
-                created by '$0 create srcdir'
+                created by '$0 create srcdir'.  If detail is specified, 
+                results of sub-tests will be shown individually.
                 
         $0 compare srcfile dstfile
                 Test the two files for equality based on all tests in the

@@ -4,9 +4,17 @@ create () {
     cd $1
     set -e
     
-    touch 'acl-test'
+    touch acl-test
     chmod +a "www allow read" acl-test
     chmod +a "nobody allow read" acl-test
+    
+    mkdir acl-test-dir
+    chmod +a "www allow read" acl-test-dir
+    chmod +a "nobody allow read" acl-test-dir
+    
+    ln -s ./acl-test acl-test-symlink
+    chmod +a "www allow read" acl-test-symlink
+    chmod +a "nobody allow read" acl-test-symlink
 }
 
 compare () {
@@ -20,7 +28,16 @@ verify () {
     cd $1
     set -e
     
+    begin-subtests
+    
     compare $2/acl-test ./acl-test
+    subtest "on files" $?
+    
+    compare $2/acl-test-dir ./acl-test-dir
+    subtest "on dirs" $?
+    
+    compare $2/acl-test-symlink ./acl-test-symlink
+    subtest "on symlinks" $?
 }
 
 clean () {
