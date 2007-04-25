@@ -2,7 +2,7 @@
 
 scriptdir=`dirname $0`
 cd $scriptdir
-export PATH="`pwd`/util:$PATH"
+export PATH="`pwd`/util:/Developer/Tools:$PATH"
 
 export printWidth=20
 
