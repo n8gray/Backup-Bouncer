@@ -1,0 +1,12 @@
+#!/bin/sh
+
+echo "We're now going to create two disk images, create some files on one,"
+echo "copy them to the other, and find out what metadata was preserved."
+echo
+
+set -ex
+
+backup-test create-vol Src
+backup-test create-vol Dst
+backup-test create /Volumes/Src
+backup-test copy detail /Volumes/Src /Volumes/Dst
