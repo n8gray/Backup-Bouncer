@@ -112,11 +112,10 @@ copy () {
     local dst="`dirname $2`/`basename $2`"
     echo "src = $src"
     echo "dst = $dst"
-    #echo Remounting with owners enabled
     # This requires the actual mount point.
-    srcDisk=`stat -f "%Sd" $src`
-    dstDisk=`stat -f "%Sd" $dst`
-    echo Enabling owners on disks
+    local srcDisk=`stat -f "%Sd" $src`
+    local dstDisk=`stat -f "%Sd" $dst`
+    echo Enabling owners on src/dst disks
     sudo mount -uvo perm /dev/$srcDisk
     sudo mount -uvo perm /dev/$dstDisk
     echo -n Cleaning

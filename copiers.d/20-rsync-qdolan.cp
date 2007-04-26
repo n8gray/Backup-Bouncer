@@ -1,6 +1,6 @@
 rsync=/usr/local/bin/rsync+xattr
 
-flags='-aH -E'
+flags="-aH -E --rsync-path=$rsync"
 
 can-copy () {
     test -e $rsync

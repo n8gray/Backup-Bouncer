@@ -8,9 +8,13 @@ source $copier
 
 if can-copy; then
     uname -a > $dst/meta
+    echo > $dst/meta
     echo $copier >> $dst/meta
+    echo > $dst/meta
     version >> $dst/meta
+    
     backup $src $dst &> $dst/log
+    exit $?
 else
     echo "Skipping: can't find needed files"
     touch $dst/skipped

@@ -53,7 +53,7 @@ verify () {
 
 # Args: none
 # Treating the working directory as though your create function had been 
-# run there, perform any necessary operations to allow 'rm -rf' to succeed.
+# run there, perform any necessary operations to allow 'sudo rm -rf' to succeed.
 # For example, unlock any locked files.
 clean () { 
     true 
