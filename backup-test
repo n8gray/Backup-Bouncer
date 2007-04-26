@@ -1,8 +1,10 @@
 #!/bin/bash
 
+#set -x
+
 scriptdir=`dirname $0`
 cd $scriptdir
-export PATH="`pwd`/util:/Developer/Tools:$PATH"
+export PATH="`pwd`/util:/Developer/Tools:$PATH:."
 
 export printWidth=20
 
@@ -25,9 +27,20 @@ create-vol () {
             -volname $1 -type SPARSE ./$1
     hdiutil attach -owners on ./$1.sparseimage
     sudo fsaclctl -p /Volumes/$1 -e
+    touch /Volumes/$1/backup-test-vol
+}
+
+check-vol () {
+    if [ -e $1/backup-test-vol ]; then
+        return 0
+    else
+        echo "$1 is not a backup-test volume!  Aborting." 1>&2
+        exit 1
+    fi
 }
 
 clean () {
+    #check-vol $1
     for t in $tests; do
         tnice=${t:2}
         printf "Cleaning: %${printWidth}s\n" "$tnice"
@@ -39,6 +52,7 @@ clean () {
 }
 
 create () {
+    check-vol $1
     clean $1
     for t in $tests; do
         tnice=${t:2}
@@ -51,10 +65,28 @@ create () {
 }
 
 verify () {
+    local src="$1"
+    local dst="$2"
+    if [ ! -e "$2" ]; then
+        echo "Copier dir '$2' does not exist"
+        return 1
+    fi
+    local code=`cat $dst/exit-code | awk '{print $1}'`
+    if [ ! "$code" = "0" ]; then
+        echo "This copier exited with error code $code"
+    fi
+    if [ ! "`wc -c $dst/log | awk '{print $1}'`" = "0" ]; then
+        echo "This copier produced log output in:"
+        echo "   $dst/log"
+    fi
     for t in $tests; do
-        tnice=${t:2}
+        local tnice=${t:2}
+        if [ ! -e "$dst/$t" ]; then
+            echo "Test dir '$dst/$t' does not exist"
+            continue
+        fi
         printf "Verifying: %${printWidth}s ... " "$tnice"
-        bash util/test-runner tests.d/$t.test verify $2/$t $1/$t \
+        bash util/test-runner tests.d/$t.test verify $dst/$t $src/$t \
             && echo ok \
             || echo FAIL
     done
@@ -72,9 +104,12 @@ compare () {
 }
 
 copy () {
+    check-vol $1
+    check-vol $2
+    
     # Make sure there's no trailing /
-    src="`dirname $1`/`basename $1`"
-    dst="`dirname $2`/`basename $2`"
+    local src="`dirname $1`/`basename $1`"
+    local dst="`dirname $2`/`basename $2`"
     echo "src = $src"
     echo "dst = $dst"
     #echo Remounting with owners enabled
@@ -95,18 +130,20 @@ copy () {
         cnice=${c:3}
         printf "Copying with: %${printWidth}s ... " "$cnice"
         mkdir $dst/$c
-        bash util/copy-runner copiers.d/$c.cp $src $dst/$c \
-            && echo ok \
+        bash util/copy-runner copiers.d/$c.cp $src $dst/$c
+        code=$?
+        echo $code > $dst/$c/exit-code
+        [ "$code" = "0" ] && echo ok \
             || echo FAIL
     done
-    for c in $copiers; do
-        cnice=${c:3}
+    for c2 in $copiers; do
+        cnice=${c2:3}
         echo
         echo "------------------ $cnice ------------------"
-        if [ -e $dst/$c/skipped ]; then
+        if [ -e $dst/$c2/skipped ]; then
             echo "    This copier was skipped"
         else
-            verify $src $dst/$c
+            verify $src $dst/$c2
         fi
     done
 }

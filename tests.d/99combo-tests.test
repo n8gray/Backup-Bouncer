@@ -1,0 +1,96 @@
+#!/bin/sh
+
+create () {
+    cd $1
+    set -e
+    
+    touch xattr-with-rfork
+    echo "I love pancakes so much" > xattr-with-rfork/rsrc
+    xattr-util w fairy.tale \
+            "My friend Goldilocks, she does things she shouldn't do" \
+            xattr-with-rfork
+
+    # A big fat test with lots of metadata
+    echo "gotta boogie" > many-metadata
+    xattr-util w big.time "so much larger than life" many-metadata
+    xattr-util w big.time2 "so much larger than life" many-metadata
+    xattr-util w big.time3 "so much larger than life" many-metadata
+    echo "Jacknifed Juggernaut" > many-metadata/..namedfork/rsrc
+    chmod 604 many-metadata
+    chflags uappnd,nodump many-metadata
+    SetFile -a ABCDEIMNSTVZ many-metadata
+    chmod +a "www allow read" many-metadata
+    chmod +a "nobody allow read" many-metadata
+    sudo chown www:www many-metadata
+}
+
+compare-xattrs () {
+    test -e $1 && \
+        test -e $2 && \
+        test "`xattr-util l $1`" = "`xattr-util l $2`" \
+        || return 1
+    for a in `xattr-util l $1`; do
+        test "`xattr-util r $a $1`" = "`xattr-util r $a $2`" || return 1
+    done
+}
+
+compare-rforks () {
+    test -e $1 && \
+        test -e $2 && \
+        cmp $1/..namedfork/rsrc $2/..namedfork/rsrc
+}
+
+compare-acls () {
+    test "`ls -le $1 | tail -n +2`" = "`ls -le $1 | tail -n +2`"
+}
+
+compare-stats () {
+    test -e $1
+    test -e $2
+    test "`stat -f '%u:%g:%p' $1`" = "`stat -f '%u:%g:%p' $2`"
+}
+
+compare-finder-flags () {
+    test "`GetFileInfo -P -a $1`" = "`GetFileInfo -P -a $2`"
+    test "`GetFileInfo -P -t $1`" = "`GetFileInfo -P -t $2`"
+    test "`GetFileInfo -P -c $1`" = "`GetFileInfo -P -c $2`"
+    test "`GetFileInfo -P -m $1`" = "`GetFileInfo -P -m $2`"
+}
+
+compare-bsd-flags () {
+    test "`/bin/ls -lo $1 | awk '{print $5}'`" = \
+         "`/bin/ls -lo $2 | awk '{print $5}'`"
+}
+
+verify () {
+    cd $1
+    
+    begin-subtests
+    
+    test -e ./xattr-with-rfork \
+        && compare-xattrs ./xattr-with-rfork $2/xattr-with-rfork \
+        && compare-rforks ./xattr-with-rfork $2/xattr-with-rfork
+    x1=$?
+    subtest "xattrs + rsrc forks" $x1
+    
+    test -e ./many-metadata \
+        && cmp ./many-metadata $2/many-metadata \
+        && compare-xattrs ./many-metadata $2/many-metadata \
+        && compare-rforks ./many-metadata $2/many-metadata \
+        && compare-acls ./many-metadata $2/many-metadata \
+        && compare-bsd-flags ./many-metadata $2/many-metadata \
+        && compare-finder-flags ./many-metadata $2/many-metadata \
+        && compare-stats ./many-metadata $2/many-metadata
+    x2=$?
+    subtest "lots of metadata" $x2
+    
+    alltrue $x1 $x2
+}
+
+clean () {
+    true
+}
+
+compare () {
+    true
+}

@@ -31,13 +31,18 @@ verify () {
     begin-subtests
     
     compare $2/acl-test ./acl-test
-    subtest "on files" $?
+    t1=$?
+    subtest "on files" $t1
     
     compare $2/acl-test-dir ./acl-test-dir
-    subtest "on dirs" $?
+    t2=$?
+    subtest "on dirs" $t2
     
     compare $2/acl-test-symlink ./acl-test-symlink
-    subtest "on symlinks" $?
+    t3=$?
+    subtest "on symlinks" $t3
+    
+    alltrue $t1 $t2 $t3
 }
 
 clean () {

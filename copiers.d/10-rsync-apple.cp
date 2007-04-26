@@ -1,6 +1,6 @@
 rsync=/usr/bin/rsync
 
-flags='-aH -E'
+flags='-aH'
 
 can-copy () {
     test -e $rsync

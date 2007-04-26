@@ -3,7 +3,10 @@
 create () {
     cd $1
     set -e
-    touch 'creation-date-test'
+    touch creation-date-test
+    # Make sure the creation date isn't the same as the modification date
+    sleep 1
+    touch creation-date-test
 }
 
 

@@ -1,0 +1,54 @@
+backup-test
+===========
+
+A unit-testing framework for OS X backup tools.
+Written by Nathaniel Gray.
+n8gray /at/ n8gray \dot\ org
+
+About
+=====
+
+This is a framework for systematically testing backup tools in OS X.  It
+contains a suite of tests to verify that metadata has survived a copy operation,
+along with a suite of copiers.  It will even automatically prepare disk images
+as source/destination targets for you.
+
+Be aware that this program is not terribly polished, so if you're not willing to look at the source
+
+Prerequisites
+=============
+
+In order to examine/set Finder metadata attributes, the following utilities are
+required:
+
+* SetFile
+* GetFileInfo
+
+These are included with the XCode developer tools, and backup-test expects them
+to be in /Developer/Tools.  If they're not there for some reason, add their
+location to your PATH and all will be well.
+
+Installation
+============
+
+1. run "make"
+2. there's no step 2.
+
+You can now run "backup-test" with no arguments for usage info.  Or, you can run
+"./autopilot" to automatically generate some disk images, run all tests, and see
+the results.
+
+History
+=======
+
+This work was inspired by the plasticsfuture blog post[1] on the (rather sad)
+state of OS X backup tools.  The post was an extremely valuable contribution in
+many ways, but it was particularly helpful for simply enumerating all (?) of the
+many and varied metadata attributes of a modern Mac HFS+ volume.  However,
+despite requests from myself and others, maurits neglected to release his test
+suite to the public.
+
+The topic of backup fidelity became important to me personally as the hard drive
+in my powerbook started dying the death of a thousand bad blocks.  So I set out
+to reproduce maurits' results and run some extra tests of my own.
+

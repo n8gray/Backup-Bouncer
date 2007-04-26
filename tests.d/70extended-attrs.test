@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # There are no tools included with OS X to manipulate extended attributes from
-# the command line.
+# the command line, so I wrote my own.
 
 create () {
     cd $1
@@ -17,6 +17,7 @@ create () {
     ln -s ./xattr-test symlink-with-xattrs
     xattr-util w good.grief 'yes, you can put these on symlinks too' \
             symlink-with-xattrs
+    
 }
 
 compare () {
@@ -46,7 +47,7 @@ verify () {
     compare ./symlink-with-xattrs $2/symlink-with-xattrs
     x3=$?
     subtest "on symlinks" $x3
-    
+        
     alltrue $x1 $x2 $x3
 }
 
