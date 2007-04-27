@@ -1,5 +1,10 @@
 #!/bin/sh
 
+if [ "$#" -lt "3" ]; then
+    echo "Usage: $0 srcVol dstVol"
+    exit 1
+fi
+
 set -e
 
 asr=/usr/sbin/asr
@@ -8,6 +13,7 @@ scriptdir="`dirname $0`"
 cd "$scriptdir/.."
 
 sudo $asr restore --source $1 --target $2
+echo $? > $2/exit-code
 
 uname -a > $2/meta
 echo >> $2/meta
