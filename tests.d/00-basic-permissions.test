@@ -1,4 +1,8 @@
 #!/bin/bash -x
+#
+# This next line adds this test to the "critical" set.  You can also use
+# Important to add it to the "important" set.
+# ##Critical##
 
 # Args:
 #   $1: a new directory where you should create your files

@@ -45,6 +45,10 @@ Note that many of the tests and all of the copiers require root priveleges.
 They run using sudo, so you'll be prompted for your password.  This also means
 you need to run the suite as a member of the admin group.
 
+One more thing.  As with most Bash scripts, this isn't guaranteed to handle
+pathnames with spaces well.  So please, don't put spaces in your test volume
+names!
+
 Adding Tests
 ============
 

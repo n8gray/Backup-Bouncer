@@ -8,12 +8,11 @@ source $copier
 
 if can-copy; then
     uname -a > $dst/meta
-    echo > $dst/meta
+    echo >> $dst/meta
     echo $copier >> $dst/meta
-    echo > $dst/meta
+    echo >> $dst/meta
     version >> $dst/meta
     
-    echo > $dst/log
     backup $src $dst &> $dst/log
     exit $?
 else

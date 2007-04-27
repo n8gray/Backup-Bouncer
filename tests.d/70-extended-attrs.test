@@ -1,5 +1,7 @@
 #!/bin/sh
 #
+# ##Important##
+#
 # There are no tools included with OS X to manipulate extended attributes from
 # the command line, so I wrote my own.
 

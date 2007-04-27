@@ -15,7 +15,7 @@ create () {
     xattr-util w big.time "so much larger than life" many-metadata
     xattr-util w big.time2 "so much larger than life" many-metadata
     xattr-util w big.time3 "so much larger than life" many-metadata
-    echo "Jacknifed Juggernaut" > many-metadata/..namedfork/rsrc
+    echo "Jack-knifed Juggernaut" > many-metadata/..namedfork/rsrc
     chmod 604 many-metadata
     chflags uappnd,nodump many-metadata
     SetFile -a ABCDEIMNSTVZ many-metadata

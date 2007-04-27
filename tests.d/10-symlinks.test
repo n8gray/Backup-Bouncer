@@ -1,4 +1,6 @@
 #!/bin/bash -x
+#
+# ##Critical##
 
 # Args:
 #   $1: a new directory where you should create your files

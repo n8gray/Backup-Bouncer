@@ -1,4 +1,8 @@
 #!/bin/bash -x
+#
+# ##Critical##
+#
+# This now just tests mtime, since it appears nothing else makes sense.
 
 # Args:
 #   $1: a new directory where you should create your files
@@ -65,12 +69,15 @@ verify () {
 
     begin-subtests
     
-#     compare-atime ./some-file $2/some-file \
-#     && compare-atime ./some-dir $2/some-dir \
-#     && compare-atime ./some-hardlink $2/some-hardlink \
-#     #&& compare-atime ./some-symlink $2/some-symlink
-#     t1=$?
-#     subtest "access time" $t1
+    # The atime usually gets changed on the *source* file by the act of 
+    # copying it, so it's not very useful to test it.  And really, who cares
+    # about atime?  ;^)
+    # compare-atime ./some-file $2/some-file \
+    # && compare-atime ./some-dir $2/some-dir \
+    # && compare-atime ./some-hardlink $2/some-hardlink \
+    # #&& compare-atime ./some-symlink $2/some-symlink
+    # t1=$?
+    # subtest "access time" $t1
 
     compare-mtime ./some-file $2/some-file \
     && compare-mtime ./some-dir $2/some-dir \
@@ -78,16 +85,17 @@ verify () {
     #&& compare-mtime ./some-symlink $2/some-symlink
     t2=$?
     subtest "modification time" $t2
-    
-    compare-ctime ./some-file $2/some-file \
-    && compare-ctime ./some-dir $2/some-dir \
-    && compare-ctime ./some-hardlink $2/some-hardlink \
-    #&& compare-ctime ./some-symlink $2/some-symlink
-    t3=$?
-    subtest "creation time" $t3
+
+    # I guess ctime can't be modified, so don't test for it.    
+#     compare-ctime ./some-file $2/some-file \
+#     && compare-ctime ./some-dir $2/some-dir \
+#     && compare-ctime ./some-hardlink $2/some-hardlink \
+#     #&& compare-ctime ./some-symlink $2/some-symlink
+#     t3=$?
+#     subtest "creation time" $t3
     
     #alltrue $t1 $t2 $t3
-    alltrue $t2 $t3
+    return $t2
 }
 
 # Args: none

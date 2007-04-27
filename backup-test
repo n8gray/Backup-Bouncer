@@ -2,8 +2,8 @@
 
 #set -x
 
-scriptdir=`dirname $0`
-cd $scriptdir
+scriptdir="`dirname $0`"
+cd "$scriptdir"
 export PATH="`pwd`/util:/Developer/Tools:$PATH:."
 
 export printWidth=20
@@ -12,7 +12,7 @@ usage () {
     name=backup-test
     echo "Usage: 
     General form:
-    $name <verb> [-d] [-t test]* [-c copier]* args
+    $name <verb> [-d] [-t test]* [-T set] [-c copier]* args
     
     Flags:
         -d           Show results of sub-tests individually instead of just
@@ -21,6 +21,13 @@ usage () {
         -t <test>    Use the given test instead of the whole test suite.  May
                      be specified multiple times.  Example:
                      $name copy -t 95-devices /Volumes/Src /Volumes/Dst
+        
+        -T <set>     Use the given set of tests.  <set> can be either 
+                     \"critical\", for tests whose failure will cause problems
+                     for average users, or \"important\", for tests whose
+                     failure may not cause problems for many users, but which
+                     may be important to power-users or may qualify as 
+                     critical in the future.
                     
         -c <copier>  Use the given copier instead of the whole copier suite.
                      May be specified multiple times.  Example:
@@ -33,23 +40,23 @@ usage () {
         $name create [-t test]* dir
                 Populate dir with test files/directories.
 
-        $name verify [-d] [-t test]* [-c copier]* srcdir dstdir
+        $name verify [-d] [-t test]* [-T set] [-c copier]* srcdir dstdir
                 Test the validity of the files in dstdir, which should be
                 copies of those in srcdir.  srcdir should contain a directory
                 created by '$name create srcdir'.
 
-        $name copy [-d] [-t test]* [-c copier]* srcdir dstdir
+        $name copy [-d] [-t test]* [-T set] [-c copier]* srcdir dstdir
                 For each copier, copy from srcdir to dstdir/copier-name,
                 then verify each copy.  Note that -t only affects the *verify*
                 step, not the copy step.
 
-        $name compare [-t test]* srcfile dstfile
+        $name compare [-t test]* [-T set] srcfile dstfile
                 Test the two files for equality based on all tests in the
                 test suite (or the tests given with -t).
 
-        $name clean [-t test]* dir
+        $name clean [-t test]* [-T set] dir
                 Remove all test files from dir.  For various reasons, 
-                simply running 'rm -rf dir' will not work.
+                simply running 'rm -rf dir' will not always work.
 
     Note that many operations require elevated privileges, so you may be
     prompted for your password.
@@ -231,6 +238,21 @@ copy () {
 }
 
 # Parse arguments
+test-set () {
+    local tests
+    case $1 in
+        critical)
+            tests=`(cd tests.d; grep -l '##Critical##' *.test)`;;
+        important)
+            tests=`(cd tests.d; grep -l '##Critical##\|##Important##' *.test)`;;
+        *)
+            echo Unknown test set: $1 >&2;;
+    esac
+    for t in $tests; do
+        printf "%s " ${t/.test/}
+    done
+}
+
 [ "$#" -lt "2" ] && usage
 verb=$1
 shift
@@ -256,7 +278,11 @@ while [ "${1:0:1}" = "-" ]; do
                 exit 1
             fi
             copiers="$copiers $1"
-            shift 1
+            shift
+            ;;
+        -T)
+            tests="$tests `test-set $1`"
+            shift
             ;;
         *)
             echo "Unkown flag: $opt"

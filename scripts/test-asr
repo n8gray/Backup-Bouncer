@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -e
+
+asr=/usr/sbin/asr
+
+scriptdir="`dirname $0`"
+cd "$scriptdir/.."
+
+sudo $asr restore --source $1 --target $2
+
+uname -a > $2/meta
+echo >> $2/meta
+$asr --version 2>> $2/meta
+
+./backup-test verify -d $1 $2 | tee $2/verify-output

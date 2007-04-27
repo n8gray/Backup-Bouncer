@@ -1,4 +1,7 @@
 #!/bin/sh
+#
+# ##Critical##
+#
 # There are a ton of these finder flags, and I'm not sure what the semantics are
 # for many of them.  Here's the SetFile help page:
 #
