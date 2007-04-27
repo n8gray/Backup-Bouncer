@@ -10,4 +10,4 @@ make
 ./backup-test create-vol Src
 ./backup-test create-vol Dst
 ./backup-test create /Volumes/Src
-./backup-test copy detail /Volumes/Src /Volumes/Dst
+./backup-test copy -d /Volumes/Src /Volumes/Dst

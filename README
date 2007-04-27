@@ -49,7 +49,7 @@ Adding Tests
 ============
 
 Adding tests is easy!  Just copy an existing test and fill in the functions.
-Take a look at tests.d/00basic-permissions.test for comments on the arguments
+Take a look at tests.d/00-basic-permissions.test for comments on the arguments
 and expected behavior of each function.
 
 Adding Copiers
