@@ -9,7 +9,7 @@ export PATH="`pwd`/util:/Developer/Tools:$PATH:."
 export printWidth=20
 
 usage () {
-    name=backup-test
+    name=bbouncer
     echo "Usage: 
     General form:
     $name <verb> [-d] [-t test]* [-T set] [-c copier]* args
@@ -106,14 +106,14 @@ create-vol () {
             -volname $1 -type SPARSE ./$1
     hdiutil attach -owners on ./$1.sparseimage
     sudo fsaclctl -p /Volumes/$1 -e
-    touch /Volumes/$1/backup-test-vol
+    touch /Volumes/$1/bbouncer-vol
 }
 
 check-vol () {
-    if [ -e $1/backup-test-vol ]; then
+    if [ -e $1/bbouncer-vol ]; then
         return 0
     else
-        echo "$1 is not a backup-test volume!  Aborting." 1>&2
+        echo "$1 is not a bbouncer volume!  Aborting." 1>&2
         exit 1
     fi
 }
@@ -219,7 +219,7 @@ copy () {
         code=$?
         echo $code > $dst/$c/exit-code
         # Make sure the volume can be cleaned
-        touch $dst/$c/backup-test-vol
+        touch $dst/$c/bbouncer-vol
         [ "$code" = "0" ] && echo ok \
             || echo FAIL
     done

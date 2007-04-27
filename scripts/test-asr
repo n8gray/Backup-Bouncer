@@ -19,4 +19,4 @@ uname -a > $2/meta
 echo >> $2/meta
 $asr --version 2>> $2/meta
 
-./backup-test verify -d $1 $2 | tee $2/verify-output
+./bbouncer verify -d $1 $2 | tee $2/verify-output

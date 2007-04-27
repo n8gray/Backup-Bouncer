@@ -7,7 +7,7 @@ echo
 set -ex
 
 make
-./backup-test create-vol Src
-./backup-test create-vol Dst
-./backup-test create /Volumes/Src
-./backup-test copy -d /Volumes/Src /Volumes/Dst
+./bbouncer create-vol Src
+./bbouncer create-vol Dst
+./bbouncer create /Volumes/Src
+./bbouncer copy -d /Volumes/Src /Volumes/Dst
