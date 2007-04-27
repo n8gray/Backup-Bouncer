@@ -233,15 +233,21 @@ copiers=''
 while [ "${1:0:1}" = "-" ]; do
     opt=$1
     shift
-    echo cmd = $0 $@
     case $opt in
         -d) export DETAIL=1;;
         -t)
+            if [ ! -f "tests.d/$1.test" ]; then
+                echo "No such test: tests.d/$1.test"
+                exit 1
+            fi
             tests="$tests $1"
-            echo "tests = $tests"
             shift
             ;;
         -c)
+            if [ ! -f "copiers.d/$1.cp" ]; then
+                echo "No such copier: copiers.d/$1.cp"
+                exit 1
+            fi
             copiers="$copiers $1"
             shift 1
             ;;
