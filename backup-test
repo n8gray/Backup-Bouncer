@@ -2,16 +2,17 @@
 
 #set -x
 
-scriptdir=`dirname $0`
+scriptdir=`dirname $name`
 cd $scriptdir
 export PATH="`pwd`/util:/Developer/Tools:$PATH:."
 
 export printWidth=20
 
 usage () {
+    name=backup-test
     echo "Usage: 
     General form:
-    $0 <verb> [-d] [-t test]* [-c copier]* args
+    $name <verb> [-d] [-t test]* [-c copier]* args
     
     Flags:
         -d           Show results of sub-tests individually instead of just
@@ -19,34 +20,34 @@ usage () {
         
         -t <test>    Use the given test instead of the whole test suite.  May
                      be specified multiple times.  Example:
-                     $0 copy -t 95-devices /Volumes/Src /Volumes/Dst
+                     $name copy -t 95-devices /Volumes/Src /Volumes/Dst
                     
         -c <copier>  Use the given copier instead of the whole copier suite.
                      May be specified multiple times.  Example:
-                     $0 copy -c 10-rsync-apple /Volumes/Src /Volumes/Dst
+                     $name copy -c 10-rsync-apple /Volumes/Src /Volumes/Dst
     
     Meanings of different verbs:
-        $0 create-vol volname
+        $name create-vol volname
                 Create and mount a disk image suitable for testing.
 
-        $0 create [-t test]* dir
+        $name create [-t test]* dir
                 Populate dir with test files/directories.
 
-        $0 verify [-d] [-t test]* [-c copier]* srcdir dstdir
+        $name verify [-d] [-t test]* [-c copier]* srcdir dstdir
                 Test the validity of the files in dstdir, which should be
                 copies of those in srcdir.  srcdir should contain a directory
-                created by '$0 create srcdir'.
+                created by '$name create srcdir'.
 
-        $0 copy [-d] [-t test]* [-c copier]* srcdir dstdir
+        $name copy [-d] [-t test]* [-c copier]* srcdir dstdir
                 For each copier, copy from srcdir to dstdir/copier-name,
                 then verify each copy.  Note that -t only affects the *verify*
                 step, not the copy step.
 
-        $0 compare [-t test]* srcfile dstfile
+        $name compare [-t test]* srcfile dstfile
                 Test the two files for equality based on all tests in the
                 test suite (or the tests given with -t).
 
-        $0 clean [-t test]* dir
+        $name clean [-t test]* dir
                 Remove all test files from dir.  For various reasons, 
                 simply running 'rm -rf dir' will not work.
 
@@ -55,20 +56,20 @@ usage () {
 
     The typical usage will be something like:
     1. Create files
-        $0 create-vol Src
-        $0 create-vol Dst
-        $0 create /Volumes/Src
+        $name create-vol Src
+        $name create-vol Dst
+        $name create /Volumes/Src
 
     2. Run test suite (as root!)
-        $0 copy -d /Volumes/Src /Volumes/Dst
+        $name copy -d /Volumes/Src /Volumes/Dst
         # That filled /Volumes/Dst with a subdirectory for each copier.
         # To verify the results from a single copy again:
-        $0 verify -d /Volumes/Src /Volumes/Dst/10-rsync-apple
+        $name verify -d /Volumes/Src /Volumes/Dst/10-rsync-apple
 
     3. Or maybe you want to test a GUI copier
-        $0 create-vol SDDst
+        $name create-vol SDDst
         # Use SuperDuper! to copy from /Volumes/Src to /Volumes/SDDst, then:
-        $0 verify -d /Volumes/Src /Volumes/SDDst
+        $name verify -d /Volumes/Src /Volumes/SDDst
     "
     exit 1
 }
@@ -208,6 +209,8 @@ copy () {
         bash util/copy-runner copiers.d/$c.cp $src $dst/$c
         code=$?
         echo $code > $dst/$c/exit-code
+        # Make sure the volume can be cleaned
+        touch $dst/$c/backup-test-vol
         [ "$code" = "0" ] && echo ok \
             || echo FAIL
     done
@@ -218,7 +221,9 @@ copy () {
         if [ -e $dst/$c2/skipped ]; then
             echo "    This copier was skipped"
         else
-            verify $src $dst/$c2
+            local outfile=$dst/$c2/verify-output
+            echo "------------------ $cnice ------------------" > $outfile
+            verify $src $dst/$c2 | tee -a $outfile
         fi
     done
 }

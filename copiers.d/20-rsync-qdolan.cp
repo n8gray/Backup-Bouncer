@@ -9,6 +9,8 @@ can-copy () {
 version () {
     echo 'Rsync "fixed for Tiger" from http://www.onthenet.com.au/~q/rsync/'
     $rsync --version
+    echo
+    echo "command = sudo $rsync $flags src/ dst"
 }
 
 backup () {

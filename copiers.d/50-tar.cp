@@ -6,6 +6,8 @@ can-copy () {
 
 version () {
     $tar --version
+    echo
+    echo "command = sudo $tar -cf - -C src . | sudo $tar -x --preserve -f - -C dst"
 }
 
 backup () {

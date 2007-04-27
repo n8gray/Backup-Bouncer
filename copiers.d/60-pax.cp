@@ -8,6 +8,8 @@ can-copy () {
 
 version () {
     ls -l $pax
+    echo
+    echo "command = cd src; sudo $pax -rw $flags . dst"
 }
 
 backup () {

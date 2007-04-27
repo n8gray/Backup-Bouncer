@@ -9,6 +9,8 @@ can-copy () {
 version () {
     # Argh.  ditto doesn't support --version!
     ls -l $ditto
+    echo
+    echo "command = sudo $ditto $flags src dst"
 }
 
 backup () {

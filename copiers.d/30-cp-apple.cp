@@ -9,6 +9,8 @@ can-copy () {
 version () {
     # Argh.  cp doesn't support --version!
     ls -l $cp
+    echo
+    echo "command = sudo $cp $flags src/* dst"
 }
 
 backup () {

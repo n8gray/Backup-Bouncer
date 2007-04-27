@@ -8,9 +8,11 @@ can-copy () {
 }
 
 # Should generate some text on stdout identifying which version of the
-# copier is being used.  This is optional.
+# copier is being used, and how it's called.  This is optional.
 version () {
     $rsync --version
+    echo
+    echo "command = sudo $rsync $flags src/ dst"
 }
 
 # Should perform a copy from $1 to $2.  Both will be directories.  Neither
