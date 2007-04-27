@@ -2,7 +2,7 @@
 
 #set -x
 
-scriptdir=`dirname $name`
+scriptdir=`dirname $0`
 cd $scriptdir
 export PATH="`pwd`/util:/Developer/Tools:$PATH:."
 
