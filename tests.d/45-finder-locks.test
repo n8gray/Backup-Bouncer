@@ -2,6 +2,9 @@
 #
 # It looks like many techniques preserve most finder flags but not locks, so we
 # test them separately.
+#
+# Actually, this is equivalent to the uchg bsd flag!  Should this even be a
+# separate test?
 
 create () {
     cd $1

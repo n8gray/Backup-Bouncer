@@ -1,3 +1,5 @@
+#!/bin/sh
+
 pax=/bin/pax
 
 flags='-p e'

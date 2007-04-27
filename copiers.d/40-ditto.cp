@@ -1,3 +1,5 @@
+#!/bin/sh
+
 ditto=/usr/bin/ditto
 
 flags='--rsrc'

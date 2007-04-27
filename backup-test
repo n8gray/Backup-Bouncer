@@ -144,11 +144,13 @@ verify () {
         echo "Copier dir '$2' does not exist"
         return 1
     fi
-    local code=`cat $dst/exit-code | awk '{print $1}'`
-    if [ ! "$code" = "0" ]; then
-        echo "This copier exited with error code $code"
+    if [ -e "$dst/exit-code" ]; then
+        local code=`cat $dst/exit-code | awk '{print $1}'`
+        if [ ! "$code" = "0" ]; then
+            echo "This copier exited with error code $code"
+        fi
     fi
-    if [ ! "`wc -c $dst/log | awk '{print $1}'`" = "0" ]; then
+    if [ -e "$dst/log" ] && [ ! "`wc -c $dst/log | awk '{print $1}'`" = "0" ]; then
         echo "This copier produced log output in:"
         echo "   $dst/log"
     fi

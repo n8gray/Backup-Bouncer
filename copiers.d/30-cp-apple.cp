@@ -1,3 +1,5 @@
+#!/bin/sh
+
 cp=/bin/cp
 
 flags='-Rp'

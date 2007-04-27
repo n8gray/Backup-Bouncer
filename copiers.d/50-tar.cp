@@ -1,3 +1,5 @@
+#!/bin/sh
+
 tar=/usr/bin/tar
 
 can-copy () {

@@ -80,3 +80,11 @@ The topic of backup fidelity became important to me personally as the hard drive
 in my powerbook started dying the death of a thousand bad blocks.  So I set out
 to reproduce maurits' results and run some extra tests of my own.
 
+References
+==========
+[1] The post that started it all: 
+    <http://blog.plasticsfuture.org/2006/03/05/the-state-of-backup-and-cloning-tools-under-mac-os-x/>
+
+[2] A nice, though not 100% accurate site on OS X filesystem metadata.  Includes references!
+    <http://www.macos-x-server.com/wiki/index.php?title=Filesystem_metadata_support>
+

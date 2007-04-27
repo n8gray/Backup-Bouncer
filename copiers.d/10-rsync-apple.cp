@@ -1,3 +1,5 @@
+#!/bin/sh
+
 rsync=/usr/bin/rsync
 
 flags="-aH -E --rsync-path=$rsync"

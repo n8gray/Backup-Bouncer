@@ -1,3 +1,5 @@
+#!/bin/sh
+
 xar=/usr/local/dports/bin/xar
 
 can-copy () {
