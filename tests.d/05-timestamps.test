@@ -37,6 +37,7 @@ compare-mtime () {
     test "`stat -f '%m' $1`" = "`stat -f '%m' $2`"
 }
 
+# comparing ctime is also surely quite silly
 compare-ctime () {
     test "`stat -f '%c' $1`" = "`stat -f '%c' $2`"
 }
@@ -86,13 +87,13 @@ verify () {
     t2=$?
     subtest "modification time" $t2
 
-    # I guess ctime can't be modified, so don't test for it.    
-#     compare-ctime ./some-file $2/some-file \
-#     && compare-ctime ./some-dir $2/some-dir \
-#     && compare-ctime ./some-hardlink $2/some-hardlink \
-#     #&& compare-ctime ./some-symlink $2/some-symlink
-#     t3=$?
-#     subtest "creation time" $t3
+    # I guess ctime can't be set intentionally, so don't test for it.    
+    # compare-ctime ./some-file $2/some-file \
+    # && compare-ctime ./some-dir $2/some-dir \
+    # && compare-ctime ./some-hardlink $2/some-hardlink \
+    # #&& compare-ctime ./some-symlink $2/some-symlink
+    # t3=$?
+    # subtest "creation time" $t3
     
     #alltrue $t1 $t2 $t3
     return $t2

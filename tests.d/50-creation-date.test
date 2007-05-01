@@ -4,9 +4,9 @@ create () {
     cd $1
     set -e
     touch creation-date-test
-    # Make sure the creation date isn't the same as the modification date
-    sleep 1
-    touch creation-date-test
+    # Make sure the creation date isn't the same as the access/modification date
+    # The modification date from SetFile is the same as the standard mtime.
+    touch -t 200010101010 creation-date-test
 }
 
 

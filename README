@@ -1,4 +1,4 @@
-backup-bouncer
+Backup Bouncer
 ==============
 
 A unit-testing framework for OS X backup tools.
@@ -8,14 +8,11 @@ n8gray /at/ n8gray \dot\ org
 About
 =====
 
-This is a framework for systematically testing backup tools in OS X.  It
-contains a suite of tests to verify that metadata has survived a copy operation,
-along with a suite of copiers.  It will even automatically prepare disk images
-as source/destination targets for you.
-
-Be aware that this program is a great big hack that doesn't do a lot of error
-checking.  You're encouraged to use the autopilot script to make sure you don't
-stray too far from what the program expects.
+This is a framework for systematically testing backup tools in OS X, with a
+focus on ensuring proper preservation of file-related metadata.  It contains a
+suite of tests to verify that metadata has survived a copy operation, along with
+a suite of copiers.  It will even automatically prepare disk images as
+source/destination targets for you.
 
 Prerequisites
 =============
@@ -50,6 +47,28 @@ One more thing.  As with most Bash scripts, this isn't guaranteed to handle
 pathnames with spaces well.  So please, don't put spaces in your test volume
 names!
 
+Limitations
+===========
+
+For the moment, Backup Bouncer is focused on validating archival tools used in
+whole-subtree copying mode.  This means that our automated tests don't test how
+well metadata is preserved for single-file copies (in tools that support them). 
+This is an issue, for example, for metadata that are stored in .DS_Store files. 
+A whole-subtree copy will copy the .DS_Store file along with the directory
+contents, but a single-file copy of a file may not preserve metadata from the
+.DS_Store file.  This is an important problem for incremental backup tools, but
+not one addressed by the automatic tests in Backup Bouncer at this time.
+
+Having said that, BB can test *any* backup of a BB volume against its source, so you can test single-file copies by:
+    1. Copying with a known-good tool (like SuperDuper)
+    2. Making some changes to a file on the source volume
+    3. Copying the file
+    4. Running "bbouncer verify" on the source/destination volumes
+
+Be aware that this program is alpha-quality software.  You're encouraged to use
+the autopilot script to make sure you don't stray too far from what the program
+expects.
+
 Adding Tests
 ============
 
@@ -71,6 +90,17 @@ You should understand that you don't have to add a copier to test your favorite
 copy mechanism.  You can do the copy by hand and then use 'bbouncer verify'
 to do the verification.  Copiers are just there to ease automated testing.
 
+BUGS
+====
+
+We need a test for Finder aliases.
+
+This should be written in OMake (omake.metaprl.org) rather than Bash.  What was
+I thinking???
+
+There should be an option for copy to automatically re-populate a src volume if
+it's stale.
+
 History
 =======
 
@@ -82,8 +112,8 @@ despite requests from myself and others, maurits neglected to release his test
 suite to the public.
 
 The topic of backup fidelity became important to me personally as the hard drive
-in my powerbook started dying the death of a thousand bad blocks.  So I set out
-to reproduce maurits' results and run some extra tests of my own.
+in my powerbook started slowly dying the death of a thousand bad blocks.  So I
+set out to reproduce maurits' results and run some extra tests of my own.
 
 References
 ==========
