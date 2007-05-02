@@ -14,21 +14,22 @@ create () {
     chmod +a "www allow read" acl-test-dir
     chmod +a "nobody allow read" acl-test-dir
     
-    ln -s ./acl-test acl-test-symlink
-    chmod +a "www allow read" acl-test-symlink
-    chmod +a "nobody allow read" acl-test-symlink
+    # Want these to be different from the symlink's target so we know
+    # we're getting the right thing.
+    #
+    # Ok, symlinks can't have acls
+    # ln -s ./acl-test acl-test-symlink
+    # chmod +a "nobody allow read" acl-test-symlink
+    # chmod +a "sshd allow read" acl-test-symlink
 }
 
 compare () {
-    set -e
-    
-    test "`ls -le $1 | tail -n +2`" = "`ls -le $1 | tail -n +2`"
+    test "`ls -Plde $1 | tail -n +2`" = "`ls -Plde $2 | tail -n +2`"
 }
 
 
 verify () {
     cd $1
-    set -e
     
     begin-subtests
     
@@ -40,11 +41,11 @@ verify () {
     t2=$?
     subtest "on dirs" $t2
     
-    compare $2/acl-test-symlink ./acl-test-symlink
-    t3=$?
-    subtest "on symlinks" $t3
+    # compare $2/acl-test-symlink ./acl-test-symlink
+    # t3=$?
+    # subtest "on symlinks" $t3
     
-    alltrue $t1 $t2 $t3
+    alltrue $t1 $t2
 }
 
 clean () {

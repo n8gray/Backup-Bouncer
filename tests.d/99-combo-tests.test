@@ -9,6 +9,10 @@ create () {
     xattr-util w fairy.tale \
             "My friend Goldilocks, she does things she shouldn't do" \
             xattr-with-rfork
+    
+    # Nope, can't do it
+    # sudo mknod device-with-acl c 3 3
+    # chmod +a "www allow read" device-with-acl
 
     # A big fat test with lots of metadata
     echo "gotta boogie" > many-metadata
@@ -41,7 +45,7 @@ compare-rforks () {
 }
 
 compare-acls () {
-    test "`ls -le $1 | tail -n +2`" = "`ls -le $1 | tail -n +2`"
+    test "`ls -le $1 | tail -n +2`" = "`ls -le $2 | tail -n +2`"
 }
 
 compare-stats () {
@@ -73,6 +77,11 @@ verify () {
     x1=$?
     subtest "xattrs + rsrc forks" $x1
     
+    # test -e ./device-with-acl \
+    #     && compare-acls ./device-with-acl $2/device-with-acl
+    # x2=$?
+    # subtest "device w/ACL" $x2
+    
     test -e ./many-metadata \
         && cmp ./many-metadata $2/many-metadata \
         && compare-xattrs ./many-metadata $2/many-metadata \
@@ -81,10 +90,10 @@ verify () {
         && compare-bsd-flags ./many-metadata $2/many-metadata \
         && compare-finder-flags ./many-metadata $2/many-metadata \
         && compare-stats ./many-metadata $2/many-metadata
-    x2=$?
-    subtest "lots of metadata" $x2
+    x3=$?
+    subtest "lots of metadata" $x3
     
-    alltrue $x1 $x2
+    alltrue $x1 $x3
 }
 
 clean () {
