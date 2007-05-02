@@ -21,11 +21,15 @@ release-tag:
 	
 release:
 	echo "Packaging version $(VERSION)"
-	mkdir release
+	[ -d release ] || mkdir release
 	TAGSDIR=`svn info | grep URL | awk '{print $$2}'`-tags \
 	   && svn export $$TAGSDIR/release-$(VERSION) \
 	                 release/$(NAME)-$(VERSION)
 	cd release \
 	   && tar cvzf $(NAME)-$(VERSION).tgz $(NAME)-$(VERSION)
 	
+upload:
+	scp release/$(NAME)-$(VERSION).tgz \
+	   n8gray.org:public_html/files/$(NAME)/
+
 .PHONY: all release-tag release
