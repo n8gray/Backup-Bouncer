@@ -1,0 +1,68 @@
+
+
+                                   ctool
+                                Version 1.1
+                              
+  What is it?
+  -----------
+
+  ctool is a small application that computes MD5 and SHA-1 checksums,
+  mindful of prebinding information stored in Mach-o files.
+
+  To improve the launch time of applications, Mac OS X implements what is
+  known as "prebinding".  Prebinding (essentially) eliminates the typical 
+  overhead of resolving external symbols at launch time by predefining an
+  address range for the required libraries.  Build time stamps are used
+  as part of the verification process and stored along with the path to
+  the library as part of the load commands of the executable.  For more
+  detailed information on prebinding, see Apple's development site:
+
+      http://developer.apple.com/tools/projectbuilder/Prebinding.html
+
+  Because this information is stored as part of the executable, any updates
+  to it will alter the value of a cryptographic checksum making it difficult
+  to verify against known good values.  Even with host integrity tools such
+  as Osiris, updates to system libraries can cause ripples of pre-binding
+  updates and cause checksums to change.  The bottom line is that there is
+  no easy way to determine what portions of these executables have changed.
+
+  ctool computes MD5 or SHA1 checksum values but skips over certain load
+  commands that containinge pre-binding information.  The theory is that
+  any updates to prebinding information will not have an effect on the
+  generated checksum values.  Thus, administrators can keep track of 
+  significant changes to any executable files.
+
+  Currently, ctool only skips the pre-binding load sections of Mach-o
+  executables.  However, future improvements will include the ability
+  to also verify that prebinding information.
+
+  Development
+  ------------------
+
+  Details related to development activities, including design
+  
+      http://www.shmoo.com/osiris/development
+
+  Installation
+  ------------
+
+  See the INSTALL file included with this distribution of ctool.
+
+  License
+  -------
+
+  Please see the file included with this source: LICENSE.
+
+  Acknowledgments
+  ----------------
+
+  Thanks to the following people who contributed in different ways
+  to this application:
+
+  Mike Vannorsdel
+  Preston Norvell
+  Bruce Potter
+  Paul Holman
+  Scott Hallock 
+
+EOF

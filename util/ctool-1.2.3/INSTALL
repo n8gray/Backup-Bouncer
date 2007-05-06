@@ -1,0 +1,27 @@
+
+CTOOL INSTALLATION
+
+  1. Building
+     --------
+
+    ctool is designed only for Mac OS X.  The supplied Makefile
+    should work just fine.  There is no installation script.  Given
+    the nature of the application, such an option probably would not
+    be used much.  Copy it to /usr/local/bin if you like.
+        
+  2. Development History
+     -------------------
+  
+        v0.9 - 25 Feb 2003 - First edition.
+        v1.0 - 21 Apr 2003 - Second release edition.
+
+  3. Contacts
+     --------
+
+     o If you have a concrete bug report for ctool please submit
+       any information to: brian@shmoo.com
+
+     Thanks for using ctool and knowngoods.
+
+                                          The Shmoo Group
+                                          http://www.shmoo.com

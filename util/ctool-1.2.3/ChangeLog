@@ -1,0 +1,50 @@
+
+
+========== VERSION 0.9 =============
+
+February 25, 2003
+
+    o initial version, supports skipped prebinding checksums.
+    o added support for recursive directories.
+
+February 27, 2003
+
+    o fixed printf error.
+    o made the hash output look similar to 'md5' and 'openssl' output.
+
+April 21, 2003
+
+    o sections are now sought out, not excluded.  That is, instead of
+      skipping certain sections (such as load commands), only a specific
+      set of sections in a Mach-o executable are used in the computation
+      of the checksum.
+
+    o added the stat (-s) option.  This is a convenience feature so that
+      the stat values of a file can easily be obtained.
+
+========== VERSION 1.2.1 =============
+
+April 27, 2003
+
+    o Added support for accepting multiple paths on the command line so
+      you can do stuff like: ctool /bin/l*
+
+    o Added knowngoods (-k) option to verify the resultant checksum or
+      checksums with https://knowngoods.org.
+
+    o more friendly parsing of command line args.
+
+========== VERSION 1.2.2 =============
+
+May 8, 2003
+
+    o Debug output now prints the type of file, exe,dylib,core, etc.
+
+========== VERSION 1.2.3 =============
+
+April 2, 2004
+
+    o fixed bug with directory file not revealing stats with -s is used.
+
+
+EOF
