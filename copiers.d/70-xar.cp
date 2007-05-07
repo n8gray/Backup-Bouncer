@@ -1,6 +1,6 @@
 #!/bin/sh
 
-xar=/usr/local/dports/bin/xar
+xar=/usr/local/bin/xar
 
 can-copy () {
     test -e $xar
@@ -13,7 +13,7 @@ version () {
     cd src
     sudo $xar -c -f tmpfile . \
         && cd dst \
-        && sudo $xar -x -f tmpfile"
+        && sudo $xar -x -P -f tmpfile"
 }
 
 backup () {
@@ -22,7 +22,7 @@ backup () {
     tmpfile=`mktemp -t bbouncer-xar` || exit 1
     sudo $xar -c -f $tmpfile . \
         && cd $2 \
-        && sudo $xar -x -f $tmpfile
+        && sudo $xar -x -P -f $tmpfile
     code=$?
     rm -f $tmpfile
     return $code

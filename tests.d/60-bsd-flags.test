@@ -53,6 +53,8 @@ verify () {
 }
 
 clean () {
-    chflags 0 dir-with-flags
-    chflags 0 file-with-flags
+    # We use sudo here because the files may have ended up owned by root after
+    # the copy (as in xar)
+    sudo chflags 0 dir-with-flags
+    sudo chflags 0 file-with-flags
 }

@@ -49,6 +49,8 @@
 
 #include <curl/curl.h>
 
+#include <string.h>
+
 #include "ctool.h"
 #include "safe_string.h"
 
