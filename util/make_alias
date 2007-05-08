@@ -1,0 +1,23 @@
+#!/usr/bin/env python
+#
+# One big problem with this:  I don't know if mkalias creates an absolute or
+# a relative alias.  What does the finder do?  What about iPhoto?
+#
+# It *appears* that mkalias imitates the finder, which is what we want.
+#
+
+import macostools
+import sys
+
+exit=sys.exit
+
+def usage():
+    print ("Usage: %s destFile aliasName" % sys.argv[0])
+
+if len(sys.argv) != 3:
+    usage()
+    exit(1)
+
+dest = sys.argv[1]
+alias = sys.argv[2]
+macostools.mkalias(dest, alias)

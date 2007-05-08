@@ -1,0 +1,59 @@
+#!/bin/bash -x
+#
+# ##Critical##
+
+# Args:
+#   $1: a new directory where you should create your files
+create () {
+    cd $1
+    echo "testing 1 2 3" > some-file
+    mkdir some-dir
+    
+    make_alias some-file alias-to-file
+    make_alias some-dir alias-to-dir
+    make_alias alias-to-file alias-to-alias
+}
+
+# Args:
+#   $1: the copied directory
+#   $2: the original directory (where create was run)
+#
+# This should fail if it detects that the copy was not faithful.
+verify-one () {
+    [ -x $1 ] || return 1
+    new_dest=`lsalias $1`
+    new_dir=$2
+    [ "`dirname $new_dest`" = "$new_dir" ]
+}    
+    
+verify () {
+    cd $1
+    begin-subtests
+    
+    verify-one ./alias-to-file "$1"
+    x1=$?
+    subtest "alias to file" $x1
+    
+    verify-one ./alias-to-dir "$1"
+    x2=$?
+    subtest "alias to dir" $x2
+    
+    verify-one ./alias-to-alias "$1"
+    x3=$?
+    subtest "alias to alias" $x3
+    
+    alltrue $x1 $x2 $x3
+}
+
+# Args: none
+# Treating the working directory as though your create function had been 
+# run there, perform any necessary operations to allow 'rm -rf' to succeed.
+# For example, unlock any locked files.
+clean () { 
+    true 
+}
+
+# XXX: This is just true for now.  It's not clear to me how this should work.
+compare () {
+    true
+}

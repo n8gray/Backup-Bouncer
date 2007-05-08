@@ -1,0 +1,31 @@
+#!/usr/bin/env python
+
+from Carbon import File
+from Carbon.File import FSSpec
+import sys
+
+exit=sys.exit
+
+def usage():
+    print ("Usage: %s filename [filename ...]" % sys.argv[0])
+
+def resolveAlias(fsspec):
+    path = File.ResolveAliasFile(fsspec, True)[0].as_pathname()
+    return path
+    
+def aliasdest(filename):
+    fss = FSSpec(filename)
+    (isalias, dummy) = fss.IsAliasFile()
+    if isalias:
+        print resolveAlias(fss)
+        exit(0)
+    else:
+        print ("Not an alias: %s" % filename)
+        exit(1)
+
+if len(sys.argv) == 1:
+    usage()
+    exit(1)
+
+for x in sys.argv[1:]:
+    aliasdest(x)
