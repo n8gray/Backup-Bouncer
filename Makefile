@@ -1,6 +1,7 @@
 all:
 	cd util && make
-
+clean:
+	cd util && make clean
 #
 # Developer targets.  To use this:
 # 1. Change ./VERSION to reflect the release version
@@ -32,4 +33,4 @@ upload:
 	scp release/$(NAME)-$(VERSION).tgz \
 	   n8gray.org:public_html/files/$(NAME)/
 
-.PHONY: all release-tag release
+.PHONY: all clean release-tag release upload

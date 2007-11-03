@@ -1,6 +1,6 @@
 #!/bin/sh
 
-xar=/usr/local/bin/xar
+xar=/usr/bin/xar
 
 can-copy () {
     test -e $xar

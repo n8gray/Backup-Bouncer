@@ -4,4 +4,8 @@ all: xattr-util
 	(cd ctool-$(ctool_version); make)
 	ln -fs ctool-$(ctool_version)/ctool .
 
-.PHONY: all
+clean:
+	rm -f xattr-util
+	(cd ctool-$(ctool_version); make clean)
+
+.PHONY: all clean
