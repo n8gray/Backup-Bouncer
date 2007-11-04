@@ -1,5 +1,7 @@
 ctool_version=1.2.3
 
+CFLAGS=-Wall
+
 all: xattr-util
 	(cd ctool-$(ctool_version); make)
 	ln -fs ctool-$(ctool_version)/ctool .

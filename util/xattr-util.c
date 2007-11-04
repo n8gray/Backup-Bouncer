@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 int main(int argc, char *argv[]) {
     
@@ -17,14 +18,18 @@ int main(int argc, char *argv[]) {
             fprintf(stderr, "Wrong number of arguments\n");
             return 1;
         }
-        char buf[160];
-        int size=getxattr(argv[3], argv[2], &buf[0], 159, 0, options);
+        char *buf;
+        int size = getxattr(argv[3], argv[2], NULL, 0, 0, options);
         if (size < 0) {
             perror(argv[0]);
             return 1;
         }
-        buf[159] = '\0';
-        printf(buf);
+        if (NULL != (buf = malloc(size))) {
+            int read_size=getxattr(argv[3], argv[2], &buf[0], size, 0, options);
+            write(stdout, buf, (read_size < size ? read_size : size));
+        } else {
+            return 1;
+        }
         return 0;
     } 
     else if (argv[1][0] == 'w') {

@@ -10,28 +10,8 @@ create () {
     ln -s ./some-file symlink1
     ln -s ./some-file symlink2
     ln -s ./symlink1 symlink3
-}
-
-# Args:
-#   $1: the copied directory
-#   $2: the original directory (where create was run)
-#
-# This should fail if it detects that the copy was not faithful.
-verify () {
-    cd $1
-    set -e
-    test -L symlink1
-    test -L symlink2
-    test -L symlink3
-    cat symlink3 | grep -q '^testing 1 2 3$'
-}
-
-# Args: none
-# Treating the working directory as though your create function had been 
-# run there, perform any necessary operations to allow 'rm -rf' to succeed.
-# For example, unlock any locked files.
-clean () { 
-    true 
+    ln -s ./bogus_file broken_symlink
+    ln -s ./broken_symlink link2broken_symlink
 }
 
 # Args:
@@ -47,5 +27,29 @@ clean () {
 compare () {
     set -e
     test "`stat -f '%HT' $1`" = "`stat -f '%HT' $2`"
-    test "`stat -f '%Y' $1`" = "`stat -f '%Y' $2`"
+    test "`readlink $1`" = "`readlink $2`"
+}
+
+# Args:
+#   $1: the copied directory
+#   $2: the original directory (where create was run)
+#
+# This should fail if it detects that the copy was not faithful.
+verify () {
+    cd $1
+    set -e
+    compare ./symlink1 $2/symlink1
+    compare ./symlink2 $2/symlink2
+    compare ./symlink3 $2/symlink3
+    compare ./broken_symlink $2/broken_symlink
+    compare ./link2broken_symlink $2/link2broken_symlink
+    cat symlink3 | grep -q '^testing 1 2 3$'
+}
+
+# Args: none
+# Treating the working directory as though your create function had been 
+# run there, perform any necessary operations to allow 'rm -rf' to succeed.
+# For example, unlock any locked files.
+clean () { 
+    true 
 }
