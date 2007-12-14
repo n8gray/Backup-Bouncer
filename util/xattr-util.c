@@ -4,10 +4,31 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+int show_xattr(char *file, char *name)
+{
+    int options = XATTR_NOFOLLOW;
+    int size = getxattr(file, name, NULL, 0, 0, options);
+    if (size < 0) {
+        return 0;
+    }
+    void *result = malloc(size);
+    if (NULL != result) {
+        size_t read_size = getxattr(file, name, result, size, 0, options);
+        if (read_size >= 0)  {
+            write(1, result, read_size);
+            free(result);
+            return 1;
+        }
+        free(result);
+    }
+    return 0;
+}
+
 int main(int argc, char *argv[]) {
     
     if (argc < 3) {
-        fprintf(stderr,"Usage: %s [l | r attr | w attr val] file\n", argv[0]);
+        fprintf(stderr,"Usage: %s [l | a | r attr | w attr val] file\n", 
+                argv[0]);
         return 1;
     }
     
@@ -18,19 +39,10 @@ int main(int argc, char *argv[]) {
             fprintf(stderr, "Wrong number of arguments\n");
             return 1;
         }
-        char *buf;
-        int size = getxattr(argv[3], argv[2], NULL, 0, 0, options);
-        if (size < 0) {
-            perror(argv[0]);
-            return 1;
-        }
-        if (NULL != (buf = malloc(size))) {
-            int read_size=getxattr(argv[3], argv[2], &buf[0], size, 0, options);
-            write(stdout, buf, (read_size < size ? read_size : size));
-        } else {
-            return 1;
-        }
-        return 0;
+        if (show_xattr(argv[3], argv[2]))
+            return 0;
+        perror(argv[0]);
+        return 1;
     } 
     else if (argv[1][0] == 'w') {
         /* Write mode */
@@ -68,6 +80,39 @@ int main(int argc, char *argv[]) {
         char *end = buf + size;
         while(buf < end) {
             printf("%s\n", buf);
+            buf += strlen(buf) + 1;
+        }
+        return 0;
+    }
+    else if (argv[1][0] == 'a') {
+        if (argc != 3) {
+            fprintf(stderr, "Wrong number of arguments\n");
+            return 1;
+        }
+        size_t size = listxattr(argv[2], NULL, 0, options);
+        if (size == 0) {
+            return 0;
+        }
+        if (size < 0) {
+            perror(argv[0]);
+            return 1;
+        }
+        char *buf = (char *)malloc(size);
+        size = listxattr(argv[2], buf, size, options);
+        if (size < 0) {
+            perror(argv[0]);
+            return 1;
+        }
+        char *end = buf + size;
+        void *value;
+        while(buf < end) {
+            printf("%s: \"", buf);
+            fflush(stdout);
+            if (!show_xattr(argv[2], buf)) {
+                perror(argv[0]);
+                return 1;
+            }
+            printf("\"\n");
             buf += strlen(buf) + 1;
         }
         return 0;

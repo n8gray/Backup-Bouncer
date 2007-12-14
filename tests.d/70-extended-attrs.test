@@ -30,6 +30,7 @@ compare () {
     for a in `xattr-util l $1`; do
         test "`xattr-util r $a $1`" = "`xattr-util r $a $2`" || return 1
     done
+    return 0
 }
 
 verify () {
