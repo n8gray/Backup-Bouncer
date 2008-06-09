@@ -1,5 +1,9 @@
 #!/bin/bash -x
 
+max_priority () {
+    echo $Exhaustive
+}
+
 # Args:
 #   $1: a new directory where you should create your files
 create () {
@@ -23,10 +27,9 @@ create () {
 #   You should also do your best to only test a single property (or group
 #   of properties) so that the meaning of a failure is clear.
 compare () {
-    set -e
-    test -L $1
-    test -L $2
-    test "`stat -f '%u:%g' $1`" = "`stat -f '%u:%g' $2`"
+    test -L $1 \
+    && test -L $2 \
+    && test "`stat -f '%u:%g' $1`" = "`stat -f '%u:%g' $2`"
 }
 
 # Args:
@@ -36,10 +39,9 @@ compare () {
 # This should fail if it detects that the copy was not faithful.
 verify () {
     cd $1
-    set -e
-    compare ./symlink1 $2/symlink1
-    compare ./symlink2 $2/symlink2
-    compare ./symlink3 $2/symlink3
+    compare ./symlink1 $2/symlink1 \
+    && compare ./symlink2 $2/symlink2 \
+    && compare ./symlink3 $2/symlink3
     
 }
 

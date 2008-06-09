@@ -1,4 +1,7 @@
 #!/bin/sh
+max_priority () {
+    echo $Exhaustive
+}
 
 create () {
     cd $1
@@ -9,19 +12,16 @@ create () {
 }
 
 compare () {
-    set -e
     test "`stat -f '%HT:%r' $1`" = "`stat -f '%HT:%r' $2`"
 }
 
 verify () {
     cd $1
-    set -e
     
-    test -c ./devzero
-    compare ./devzero $2/devzero
-    
-    test -b ./devvn0
-    compare ./devvn0 $2/devvn0
+    test -c ./devzero \
+    && compare ./devzero $2/devzero \
+    && test -b ./devvn0 \
+    && compare ./devvn0 $2/devvn0
 }
 
 clean () {

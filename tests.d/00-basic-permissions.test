@@ -1,8 +1,11 @@
 #!/bin/bash -x
 #
 # This next line adds this test to the "critical" set.  You can also use
-# Important to add it to the "important" set.
-# ##Critical##
+# $Important to add it to the "important" set.
+max_priority () {
+    echo $Critical
+}
+
 
 # Args:
 #   $1: a new directory where you should create your files
@@ -34,10 +37,9 @@ create () {
 #   You should also do your best to only test a single property (or group
 #   of properties) so that the meaning of a failure is clear.
 compare () {
-    set -e
-    test -e $1
-    test -e $2
-    test "`stat -f '%u:%g:%p' $1`" = "`stat -f '%u:%g:%p' $2`"
+    test -e $1 \
+    && test -e $2 \
+    && test "`stat -f '%u:%g:%p' $1`" = "`stat -f '%u:%g:%p' $2`"
 }
 
 # Args:
@@ -47,12 +49,11 @@ compare () {
 # This should fail if it detects that the copy was not faithful.
 verify () {
     cd $1
-    set -e
-
-    compare ./owned-by-me $2/owned-by-me
-    compare ./owned-by-root $2/owned-by-root
-    compare ./owned-by-www $2/owned-by-www
-    compare ./some-dir $2/some-dir
+    
+    compare ./owned-by-me $2/owned-by-me \
+    && compare ./owned-by-root $2/owned-by-root \
+    && compare ./owned-by-www $2/owned-by-www \
+    && compare ./some-dir $2/some-dir
 }
 
 # Args: none

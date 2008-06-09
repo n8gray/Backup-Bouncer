@@ -1,16 +1,25 @@
 #!/bin/bash
 
+declare -a priority_desc
+priority_desc=([$Critical]='(Critical)' \
+    [$Important]='(Important)' \
+    [$Exhaustive]='')
+
+has_subtests=""
+
 begin-subtests () {
     [ -n "$DETAIL" ] && echo
 }
 
 subtest () {
     if [ -n "$DETAIL" ]; then
+        has_subtests="1"
+        test_desc="${priority_desc[$test_priority]}"
         printf "   Sub-test: %${printWidth}s ... " "$1"
         if [ "$2" = "0" ]; then
-            echo ok
+            echo "ok $test_desc"
         else
-            echo FAIL
+            echo "FAIL $test_desc"
         fi
     fi
 }
@@ -22,7 +31,7 @@ alltrue () {
     done
     return 0
 }
-        
+
 source $1
 shift
 
@@ -35,7 +44,27 @@ case $1 in
         clean
     ;;
     compare|verify)
-        $1 $2 $3
+        activity=$2
+        testname=$3
+        src=$4
+        dst=$5
+
+        max_priority=`max_priority`
+        test_priority=$max_priority
+        max_desc=${priority_desc[$max_priority]}
+        if (( $max_priority <= $run_priority )); then
+            printf "%s: %${printWidth}s ... " "$activity" "$testname"
+            $1 $src $dst
+            x=$?
+            # Only print the final status if there weren't subtests
+            if [ ! "$has_subtests" ]; then
+                if [ "$x" = "0" ]; then
+                    echo "ok $max_desc"
+                else
+                    echo "FAIL $max_desc"
+                fi
+            fi
+        fi
     ;;
     *)
         echo "Ops: create, verify, clean, compare"

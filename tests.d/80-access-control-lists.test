@@ -1,6 +1,8 @@
 #!/bin/sh
-#
-# ##Important##
+
+max_priority () {
+    echo $Important
+}
 
 create () {
     cd $1

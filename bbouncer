@@ -8,6 +8,11 @@ export PATH="`pwd`/util:/Developer/Tools:$PATH:."
 
 export printWidth=20
 
+export Critical=0
+export Important=1
+export Exhaustive=2
+export run_priority=$Exhaustive
+
 usage () {
     name=bbouncer
     echo "Usage: 
@@ -22,12 +27,15 @@ usage () {
                      be specified multiple times.  Example:
                      $name copy -t 95-devices /Volumes/Src /Volumes/Dst
         
-        -T <set>     Use the given set of tests.  <set> can be either 
-                     \"critical\", for tests whose failure will cause problems
-                     for average users, or \"important\", for tests whose
-                     failure may not cause problems for many users, but which
-                     may be important to power-users or may qualify as 
-                     critical in the future.
+        -T <set>     Use the given set of tests.  <set> can be: 
+                        \"critical\":  for tests whose failure will cause 
+                                       problems for average users
+                        \"important\": for tests whose failure may not cause 
+                                       problems for many users, but which
+                                       may be important to power-users or may
+                                       qualify as critical in the future.
+                        \"all\":       for the everything + the kitchen sink
+                     The default is \"all\".
                     
         -c <copier>  Use the given copier instead of the whole copier suite.
                      May be specified multiple times.  Example:
@@ -167,10 +175,8 @@ verify () {
             echo "Test dir '$dst/$t' does not exist"
             continue
         fi
-        printf "Verifying: %${printWidth}s ... " "$tnice"
-        bash util/test-runner tests.d/$t.test verify $dst/$t $src/$t \
-            && echo ok \
-            || echo FAIL
+        #printf "Verifying: %${printWidth}s ... " "$tnice"
+        bash util/test-runner tests.d/$t.test verify Verifying $tnice $dst/$t $src/$t 
     done
 }
 
@@ -178,10 +184,8 @@ verify () {
 compare () {
     for t in $tests; do
         tnice=${t:3}
-        printf "Comparing: %${printWidth}s ... " "$tnice"
-        bash util/test-runner tests.d/$t.test compare $1 $2 \
-            && echo ok \
-            || echo FAIL
+        #printf "Comparing: %${printWidth}s ... " "$tnice"
+        bash util/test-runner tests.d/$t.test compare Comparing $tnice $1 $2
     done
 }
 
@@ -281,8 +285,14 @@ while [ "${1:0:1}" = "-" ]; do
             shift
             ;;
         -T)
-            tests="$tests `test-set $1`"
+            prio="$1"
             shift
+            case $prio in
+                critical) run_priority=$Critical ;;
+                important) run_priority=$Important ;;
+                all) run_priority=$Exhaustive ;;
+                *) usage ;;
+            esac
             ;;
         *)
             echo "Unkown flag: $opt"

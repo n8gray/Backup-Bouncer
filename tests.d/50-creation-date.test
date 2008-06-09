@@ -1,5 +1,9 @@
 #!/bin/sh
 
+max_priority () {
+    echo $Exhaustive
+}
+
 create () {
     cd $1
     set -e
@@ -13,7 +17,6 @@ create () {
 
 verify () {
     cd $1
-    set -e
     test "`GetFileInfo -d $2/creation-date-test`" = \
          "`GetFileInfo -d ./creation-date-test`"
 }
@@ -23,6 +26,5 @@ clean () {
 }
 
 compare () {
-    set -e
     test "`GetFileInfo -P -d $1`" = "`GetFileInfo -P -d $2`"
 }

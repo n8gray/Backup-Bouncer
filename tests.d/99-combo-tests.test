@@ -1,5 +1,9 @@
 #!/bin/sh
 
+max_priority () {
+    echo $Exhaustive
+}
+
 create () {
     cd $1
     set -e

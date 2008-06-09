@@ -1,9 +1,11 @@
 #!/bin/sh
 #
-# ##Important##
-#
 # There are no tools included with OS X to manipulate extended attributes from
 # the command line, so I wrote my own.
+
+max_priority () {
+    echo $Important
+}
 
 create () {
     cd $1
@@ -47,6 +49,7 @@ verify () {
     x2=$?
     subtest "on directories" $x2
     
+    test_priority=$Exhaustive
     compare ./symlink-with-xattrs $2/symlink-with-xattrs
     x3=$?
     subtest "on symlinks" $x3

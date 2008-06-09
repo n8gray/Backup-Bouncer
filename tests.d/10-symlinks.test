@@ -1,6 +1,8 @@
 #!/bin/bash -x
-#
-# ##Critical##
+
+max_priority () {
+    echo $Critical
+}
 
 # Args:
 #   $1: a new directory where you should create your files
@@ -25,9 +27,8 @@ create () {
 #   You should also do your best to only test a single property (or group
 #   of properties) so that the meaning of a failure is clear.
 compare () {
-    set -e
-    test "`stat -f '%HT' $1`" = "`stat -f '%HT' $2`"
-    test "`readlink $1`" = "`readlink $2`"
+    test "`stat -f '%HT' $1`" = "`stat -f '%HT' $2`" \
+    && test "`readlink $1`" = "`readlink $2`"
 }
 
 # Args:
@@ -37,12 +38,11 @@ compare () {
 # This should fail if it detects that the copy was not faithful.
 verify () {
     cd $1
-    set -e
-    compare ./symlink1 $2/symlink1
-    compare ./symlink2 $2/symlink2
-    compare ./symlink3 $2/symlink3
-    compare ./broken_symlink $2/broken_symlink
-    compare ./link2broken_symlink $2/link2broken_symlink
+    compare ./symlink1 $2/symlink1 || return 1
+    compare ./symlink2 $2/symlink2 || return 1
+    compare ./symlink3 $2/symlink3 || return 1
+    compare ./broken_symlink $2/broken_symlink || return 1
+    compare ./link2broken_symlink $2/link2broken_symlink || return 1
     cat symlink3 | grep -q '^testing 1 2 3$'
 }
 

@@ -1,6 +1,8 @@
 #!/bin/sh
-#
-# ##Important##
+
+max_priority () {
+    echo $Important
+}
 
 create () {
     cd $1
@@ -20,14 +22,14 @@ verify () {
     cd $1
     tmpfile=/tmp/hardlinks-test
     set +e
-    begin-subtests
+    #begin-subtests
 
     stat -f "%i" link1 > $tmpfile
     stat -f "%i" link2 >> $tmpfile
     stat -f "%i" link3 >> $tmpfile
     test "`uniq $tmpfile | wc -l | awk '{print $1}'`" = "1"
-    x1=$?
-    subtest "on files" $x1
+    #x1=$?
+    #subtest "on files" $x1
     
     # stat -f "%i" dir1 > $tmpfile
     # stat -f "%i" dir2/dir1-link >> $tmpfile
@@ -35,8 +37,8 @@ verify () {
     # x2=$?
     # subtest "on directories" $x2
     
-    rm -f $tmpfile
-    alltrue $x1
+    #rm -f $tmpfile
+    #alltrue $x1
 }
 
 clean () {
@@ -47,6 +49,5 @@ clean () {
 # to the file, but there's no easy way to test that.  Instead, just check that
 # the link count is the same.  Not great, but oh well.
 compare () {
-    set -e
     test "`stat -f '%l' $1`" = "`stat -f '%l' $2`"
 }

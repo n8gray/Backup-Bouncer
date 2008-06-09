@@ -1,5 +1,9 @@
 #!/bin/sh
 
+max_priority () {
+    echo $Exhaustive
+}
+
 create () {
     cd $1
     set -e
@@ -8,16 +12,14 @@ create () {
 }
 
 compare () {
-    set -e
     test "`stat -f '%HT' $1`" = "`stat -f '%HT' $2`"
 }
 
 verify () {
     cd $1
-    set -e
     
-    test -p ./some-fifo
-    compare ./some-fifo $2/some-fifo
+    test -p ./some-fifo \
+    && compare ./some-fifo $2/some-fifo
 }
 
 clean () {

@@ -1,7 +1,5 @@
 #!/bin/sh
 #
-# ##Critical##
-#
 # There are a ton of these finder flags, and I'm not sure what the semantics are
 # for many of them.  Here's the SetFile help page:
 #
@@ -41,6 +39,10 @@
 # I suppose the semantics don't really matter.  We just want to know if the
 # flags are preserved.
 
+max_priority () {
+    echo $Critical
+}
+
 create () {
     cd $1
     set -e
@@ -71,26 +73,23 @@ create () {
 }
 
 compare () {
-    set -e
-    test "`GetFileInfo -P -a $1`" = "`GetFileInfo -P -a $2`"
-    test "`GetFileInfo -P -t $1`" = "`GetFileInfo -P -t $2`"
-    test "`GetFileInfo -P -c $1`" = "`GetFileInfo -P -c $2`"
-    test "`GetFileInfo -P -m $1`" = "`GetFileInfo -P -m $2`"
+    test "`GetFileInfo -P -a $1`" = "`GetFileInfo -P -a $2`" \
+    && test "`GetFileInfo -P -t $1`" = "`GetFileInfo -P -t $2`" \
+    && test "`GetFileInfo -P -c $1`" = "`GetFileInfo -P -c $2`" \
+    && test "`GetFileInfo -P -m $1`" = "`GetFileInfo -P -m $2`"
 }
 
 verify () {
     cd $1
-    set -e
     
-    test "`GetFileInfo -t type-and-creator`" = '"TEXT"'
-    test "`GetFileInfo -c type-and-creator`" = '"MSWD"'
-    
-    test "`GetFileInfo -ab bundle-dir`" = "1"
-    test "`GetFileInfo -av invisible-dir`" = "1"
-    test "`GetFileInfo -ae hidden-extension.txt`" = "1"
-    test "`GetFileInfo -as system-file`" = "1"
-    compare ./mucho-flags-file $2/mucho-flags-file
-    compare ./mucho-flags-dir $2/mucho-flags-dir
+    test "`GetFileInfo -t type-and-creator`" = '"TEXT"' \
+    && test "`GetFileInfo -c type-and-creator`" = '"MSWD"' \
+    && test "`GetFileInfo -ab bundle-dir`" = "1" \
+    && test "`GetFileInfo -av invisible-dir`" = "1" \
+    && test "`GetFileInfo -ae hidden-extension.txt`" = "1" \
+    && test "`GetFileInfo -as system-file`" = "1" \
+    && compare ./mucho-flags-file $2/mucho-flags-file \
+    && compare ./mucho-flags-dir $2/mucho-flags-dir
 }
 
 clean () {

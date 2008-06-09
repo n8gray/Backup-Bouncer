@@ -1,6 +1,8 @@
 #!/bin/sh
-#
-# ##Critical##
+
+max_priority () {
+    echo $Critical
+}
 
 create () {
     cd $1
@@ -38,6 +40,7 @@ verify () {
     x1=$?
     subtest "on files" $x1
     
+    test_priority=$Important
     test -e ./hl-rfork1 \
         && test -e ./hl-rfork2 \
         && compare-inodes ./hl-rfork1 ./hl-rfork2 \

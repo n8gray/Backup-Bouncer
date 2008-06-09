@@ -6,6 +6,10 @@
 # Actually, this is equivalent to the uchg bsd flag!  Should this even be a
 # separate test?
 
+max_priority () {
+    echo $Exhaustive
+}
+
 create () {
     cd $1
     set -e
@@ -16,7 +20,6 @@ create () {
 
 verify () {
     cd $1
-    set -e
     test "`GetFileInfo -al ./locked-file`" = "1"
 }
 
@@ -25,6 +28,5 @@ clean () {
 }
 
 compare () {
-    set -e
     test "`GetFileInfo -P -al $1`" = "`GetFileInfo -P -al $2`"
 }
