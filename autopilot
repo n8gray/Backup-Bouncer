@@ -1,5 +1,10 @@
 #!/bin/sh
 
+if [ "`id -u`" != "0" ]; then
+    echo "autopilot needs to be run as:  sudo autopilot"
+    exit 1
+fi
+
 echo "We're now going to create two disk images, create some files on one,"
 echo "copy them to the other, and find out what metadata was preserved."
 echo

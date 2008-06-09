@@ -34,6 +34,9 @@ Installation & Usage
 1. run "make"
 2. there's no step 2.
 
+To be clear, you do NOT install backup bouncer, you simply run it from the place
+you unpacked it.
+
 You can now run "bbouncer" with no arguments for usage info.  Or, you can run
 "./autopilot" to automatically generate some disk images, run all tests, and see
 the results.  Also take a look in the scripts directory for scripts you can use

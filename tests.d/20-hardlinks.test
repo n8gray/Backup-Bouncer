@@ -10,9 +10,9 @@ create () {
     ln ./link1 link3
     
     # Leopard allows hard links to directories
-    mkdir dir1
-    mkdir dir2
-    hardlink-util dir1 dir2/dir1-link
+    # mkdir dir1
+    # mkdir dir2
+    # hardlink-util dir1 dir2/dir1-link
 }
 
 
@@ -29,14 +29,14 @@ verify () {
     x1=$?
     subtest "on files" $x1
     
-    stat -f "%i" dir1 > $tmpfile
-    stat -f "%i" dir2/dir1-link >> $tmpfile
-    test "`uniq $tmpfile | wc -l | awk '{print $1}'`" = "1"
-    x2=$?
-    subtest "on directories" $x2
+    # stat -f "%i" dir1 > $tmpfile
+    # stat -f "%i" dir2/dir1-link >> $tmpfile
+    # test "`uniq $tmpfile | wc -l | awk '{print $1}'`" = "1"
+    # x2=$?
+    # subtest "on directories" $x2
     
     rm -f $tmpfile
-    alltrue $x1 $x2
+    alltrue $x1
 }
 
 clean () {
