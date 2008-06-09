@@ -7,18 +7,10 @@ create () {
     set -e
     echo "testing 1 2 3" > some-file
     echo "Hello world" > some-file/rsrc
-}
-
-
-verify () {
-    cd $1
-    set -e
-    grep -q '^testing 1 2 3$' some-file
-    grep -q '^Hello world$' some-file/rsrc
-}
-
-clean () {
-    true
+    
+    echo "Apple's rsync had issues with resource forks + hardlinks" > hl-rfork1
+    ln hl-rfork1 hl-rfork2
+    echo "Let's see what happens..." > hl-rfork1/rsrc
 }
 
 compare () {
@@ -29,4 +21,34 @@ compare () {
     else
         true
     fi
+}
+
+compare-inodes () {
+    test "`stat -f \"%i\" $1`" = "`stat -f \"%i\" $2`"
+}
+
+verify () {
+    cd $1
+    
+    begin-subtests
+    
+    test -e ./some-file \
+        && grep -q '^testing 1 2 3$' ./some-file \
+        && grep -q '^Hello world$' ./some-file/rsrc
+    x1=$?
+    subtest "on files" $x1
+    
+    test -e ./hl-rfork1 \
+        && test -e ./hl-rfork2 \
+        && compare-inodes ./hl-rfork1 ./hl-rfork2 \
+        && compare ./hl-rfork1 $2/hl-rfork1 \
+        && compare ./hl-rfork2 $2/hl-rfork2
+    x2=$?
+    subtest "on hardlinked files" $x2
+    
+    alltrue $x1 $x2
+}
+
+clean () {
+    true
 }

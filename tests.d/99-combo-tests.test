@@ -29,12 +29,12 @@ create () {
     
     # I've been told that Apple's rsync once had a problem with the combination
     # of hardlinks and resource forks.  Let's try it
-    touch hl-rfork1
-    ln hl-rfork1 hl-rfork2
-    echo "Willie was a whale and he walked on the water" \
-        > hl-rfork1/..namedfork/rsrc
-    echo "and he twied to be wuff and he twied to be tough" \
-        >> hl-rfork2/..namedfork/rsrc
+    # touch hl-rfork1
+    # ln hl-rfork1 hl-rfork2
+    # echo "Willie was a whale and he walked on the water" \
+        # > hl-rfork1/..namedfork/rsrc
+    # echo "and he twied to be wuff and he twied to be tough" \
+        # >> hl-rfork2/..namedfork/rsrc
 }
 
 compare-xattrs () {
@@ -106,15 +106,16 @@ verify () {
     x3=$?
     subtest "lots of metadata" $x3
     
-    test -e ./hl-rfork1 \
-        && test -e ./hl-rfork2 \
-        && compare-inodes ./hl-rfork1 ./hl-rfork2 \
-        && compare-rforks ./hl-rfork1 $2/hl-rfork1 \
-        && compare-rforks ./hl-rfork2 $2/hl-rfork2
-    x4=$?
-    subtest "hardlinks + rsrc forks" $x4
+    # For now, this goes in the resource-forks test so it can be "critical"
+    # test -e ./hl-rfork1 \
+        # && test -e ./hl-rfork2 \
+        # && compare-inodes ./hl-rfork1 ./hl-rfork2 \
+        # && compare-rforks ./hl-rfork1 $2/hl-rfork1 \
+        # && compare-rforks ./hl-rfork2 $2/hl-rfork2
+    # x4=$?
+    # subtest "hardlinks + rsrc forks" $x4
     
-    alltrue $x1 $x3 $x4
+    alltrue $x1 $x3
 }
 
 clean () {
