@@ -30,6 +30,8 @@ create () {
     chmod +a "www allow read" many-metadata
     chmod +a "nobody allow read" many-metadata
     sudo chown www:www many-metadata
+    # Lock the file to make sure the copier doesn't lock it too early
+    SetFile -a L many-metadata
     
     # I've been told that Apple's rsync once had a problem with the combination
     # of hardlinks and resource forks.  Let's try it
@@ -123,7 +125,7 @@ verify () {
 }
 
 clean () {
-    true
+    sudo SetFile -a l many-metadata
 }
 
 compare () {
