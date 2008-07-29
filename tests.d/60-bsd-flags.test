@@ -44,8 +44,9 @@ create () {
 }
 
 compare () {
-    test "`/bin/ls -lo $1 | awk '{print $5}'`" = \
-         "`/bin/ls -lo $2 | awk '{print $5}'`"
+    #set -x
+    test "`/bin/ls -dlO $1 | awk '{print $5}'`" = \
+         "`/bin/ls -dlO $2 | awk '{print $5}'`"
 }
 
 verify () {
