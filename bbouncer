@@ -113,7 +113,7 @@ create-vol () {
     hdiutil create -size 40m -fs 'Journaled HFS+' \
             -volname $1 -type SPARSE ./$1
     hdiutil attach -owners on ./$1.sparseimage
-    sudo fsaclctl -p /Volumes/$1 -e
+    /usr/bin/which -s fsaclctl && sudo fsaclctl -p /Volumes/$1 -e
     touch /Volumes/$1/bbouncer-vol
 }
 

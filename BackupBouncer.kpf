@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Komodo Project File - DO NOT EDIT -->
+<project id="dd5d10e2-f500-744e-90cd-00d28e1ff99d" kpf_version="4" name="BackupBouncer.kpf">
+<livefolder id="dad6800d-be5d-c24e-b7c0-ce859f2fca64" idref="dd5d10e2-f500-744e-90cd-00d28e1ff99d" name="backup-bouncer" url="file:///Users/n8gray/src/backup-bouncer">
+</livefolder>
+<preference-set idref="dd5d10e2-f500-744e-90cd-00d28e1ff99d">
+  <boolean id="import_live">0</boolean>
+</preference-set>
+</project>
