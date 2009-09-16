@@ -19,7 +19,7 @@ verify () {
     cd $1
     
     test -p ./some-fifo \
-    && compare ./some-fifo $2/some-fifo
+     && compare ./some-fifo $2/some-fifo
 }
 
 clean () {

@@ -25,13 +25,13 @@ create () {
     xattr-util w big.time3 "so much larger than life" many-metadata
     echo "Jack-knifed Juggernaut" > many-metadata/..namedfork/rsrc
     chmod 604 many-metadata
-    chflags uappnd,nodump many-metadata
     SetFile -a ABCDEIMNSTVZ many-metadata
     chmod +a "www allow read" many-metadata
     chmod +a "nobody allow read" many-metadata
     sudo chown www:www many-metadata
+    chflags uappnd,nodump many-metadata
     # Lock the file to make sure the copier doesn't lock it too early
-    SetFile -a L many-metadata
+    sudo SetFile -a L many-metadata
     
     # I've been told that Apple's rsync once had a problem with the combination
     # of hardlinks and resource forks.  Let's try it

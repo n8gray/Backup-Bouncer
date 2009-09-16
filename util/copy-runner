@@ -14,6 +14,7 @@ if can-copy; then
     version >> $dst/meta
     
     backup $src $dst &> $dst/log
+    #backup $src $dst | tee $dst/log
     exit $?
 else
     echo "Skipping: can't find needed files"
