@@ -126,8 +126,3 @@ References
 [2] A nice, though not 100% accurate site on OS X filesystem metadata.  Includes references!
     <http://www.macos-x-server.com/wiki/index.php?title=Filesystem_metadata_support>
 
-Acknowledgements
-================
-This product includes software (ctool) developed by the
-The Shmoo Group (http://www.shmoo.com).
-
