@@ -68,7 +68,7 @@ create () {
     SetFile -a ABCDEIMNSTVZ mucho-flags-file
     
     # All possible on a dir
-    touch mucho-flags-dir
+    mkdir mucho-flags-dir
     SetFile -a CDEIVZ mucho-flags-dir
 }
 
