@@ -74,9 +74,19 @@ create () {
 
 compare () {
     test "`GetFileInfo -P -a $1`" = "`GetFileInfo -P -a $2`" \
-    && test "`GetFileInfo -P -t $1`" = "`GetFileInfo -P -t $2`" \
-    && test "`GetFileInfo -P -c $1`" = "`GetFileInfo -P -c $2`" \
     && test "`GetFileInfo -P -m $1`" = "`GetFileInfo -P -m $2`"
+    x=$?
+    if [ -f "$1" ]; then
+        test "`GetFileInfo -P -t $1`" = "`GetFileInfo -P -t $2`" \
+        && test "`GetFileInfo -P -c $1`" = "`GetFileInfo -P -c $2`"
+        x2=$?
+    elif [ -d "$1" ]; then
+        x2=0
+    else
+        echo "ERROR: Unknown file type in 40-finder-flags compare test"
+        x2=1
+    fi
+    alltrue $x $x2
 }
 
 verify () {
