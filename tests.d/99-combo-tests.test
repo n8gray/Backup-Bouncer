@@ -9,7 +9,7 @@ create () {
     set -e
     
     touch xattr-with-rfork
-    echo "I love pancakes so much" > xattr-with-rfork/rsrc
+    echo "I love pancakes so much" > xattr-with-rfork/..namedfork/rsrc
     xattr-util w fairy.tale \
             "My friend Goldilocks, she does things she shouldn't do" \
             xattr-with-rfork

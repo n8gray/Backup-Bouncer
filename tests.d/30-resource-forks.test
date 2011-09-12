@@ -8,18 +8,18 @@ create () {
     cd $1
     set -e
     echo "testing 1 2 3" > some-file
-    echo "Hello world" > some-file/rsrc
+    echo "Hello world" > some-file/..namedfork/rsrc
     
     echo "Apple's rsync had issues with resource forks + hardlinks" > hl-rfork1
     ln hl-rfork1 hl-rfork2
-    echo "Let's see what happens..." > hl-rfork1/rsrc
+    echo "Let's see what happens..." > hl-rfork1/..namedfork/rsrc
 }
 
 compare () {
     set -e
     # We only test regular files.  Should we test others?
     if [ -f "$1" ]; then
-        cmp "$1/rsrc" "$2/rsrc"
+        cmp "$1/..namedfork/rsrc" "$2/..namedfork/rsrc"
     else
         true
     fi
@@ -36,7 +36,7 @@ verify () {
     
     test -e ./some-file \
         && grep -q '^testing 1 2 3$' ./some-file \
-        && grep -q '^Hello world$' ./some-file/rsrc
+        && grep -q '^Hello world$' ./some-file/..namedfork/rsrc
     x1=$?
     subtest "on files" $x1
     
