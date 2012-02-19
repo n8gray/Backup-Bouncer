@@ -5,9 +5,27 @@ mlbackup=/usr/local/bin/mlbackup
 # flags="-aH -E --rsync-path=$rsync"
 # This should resemble what we use with mlbackup as closely as possible.
 
-config=$(mktemp -t backupbouncer-82-mlbackup-.XXXXXXXXXX)
 
-echo "# mlbackup backup bouncer configuration file
+# Should exit with code 0 if the necessary programs exist, 1 otherwise
+can-copy () {
+    test -e $mlbackup
+}
+
+# Should generate some text on stdout identifying which version of the
+# copier is being used, and how it's called.  This is optional.
+version () {
+    $mlbackup
+    echo
+    echo "command = sudo $mlbackup $config"
+}
+
+# Should perform a copy from $1 to $2.  Both will be directories.  Neither
+# will end with '/'.  So you'll get something like:
+#   backup /Volumes/Src /Volumes/Dst/99-foo
+backup () {
+    config=$(mktemp -t backupbouncer-82-mlbackup-.XXXXXXXXXX)
+
+    echo "# mlbackup backup bouncer configuration file
 # -----------------------------------------------------------------------------
 MLdebug=1
 MLbeVerbose="-vvv"
@@ -48,29 +66,12 @@ MLadminEmail=""
 # MLcustomRsyncOptions
 #EOF
 " > $config
-
-# Should exit with code 0 if the necessary programs exist, 1 otherwise
-can-copy () {
-    test -e $mlbackup
-}
-
-# Should generate some text on stdout identifying which version of the
-# copier is being used, and how it's called.  This is optional.
-version () {
-    $mlbackup
-    echo
-    echo "command = sudo $mlbackup $config"
-}
-
-# Should perform a copy from $1 to $2.  Both will be directories.  Neither
-# will end with '/'.  So you'll get something like:
-#   backup /Volumes/Src /Volumes/Dst/99-foo
-backup () {
     sudo $mlbackup $config
-returnvalue=$?
-# mlbackuptarget=$(ls -1 /Volumes/Dst/82-mlbackup/82-mlbackup-2011*)
+    returnvalue=$?
+    # mlbackuptarget=$(ls -1 /Volumes/Dst/82-mlbackup/82-mlbackup-2011*)
 
-mv /Volumes/Dst/82-mlbackup/82-mlbackup-*/src/* /Volumes/Dst/82-mlbackup/
+    mv /Volumes/Dst/82-mlbackup/82-mlbackup-*/src/* /Volumes/Dst/82-mlbackup/
 
-return $returnvalue 
+    rm "$config"
+    return $returnvalue 
 }
