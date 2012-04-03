@@ -6,15 +6,26 @@ max_priority () {
 
 create () {
     cd $1
-    set -e
     
     touch acl-test
     chmod +a "www allow read" acl-test
+    chmod +a "www deny write" acl-test
     chmod +a "nobody allow read" acl-test
     
+    touch acl-test-locked-file
+    chmod +a "www allow read" acl-test-locked-file
+    chmod +a "www deny write" acl-test-locked-file
+    chmod +a "nobody allow read" acl-test-locked-file
+    chflags uchg acl-test-locked-file
+    
     mkdir acl-test-dir
+    touch acl-test-dir/test_file_before_inherited_acl_applied
     chmod +a "www allow read" acl-test-dir
     chmod +a "nobody allow read" acl-test-dir
+    chmod +a "nobody deny delete_child" acl-test-dir
+    chmod +a "staff allow list,directory_inherit,file_inherit" acl-test-dir
+    touch acl-test-dir/test_file_after_inherited_acl_applied
+
     
     # Want these to be different from the symlink's target so we know
     # we're getting the right thing.
@@ -47,7 +58,19 @@ verify () {
     # t3=$?
     # subtest "on symlinks" $t3
     
-    alltrue $t1 $t2
+    compare $2/acl-test-locked-file ./acl-test-locked-file
+    t3=$?
+    subtest "on locked files" $t3
+    
+    compare $2/acl-test-dir/test_file_before_inherited_acl_applied ./acl-test-dir/test_file_before_inherited_acl_applied
+    t4=$?
+    subtest "on non-inherited acls" $t4
+    
+    compare $2/acl-test-dir/test_file_after_inherited_acl_applied ./acl-test-dir/test_file_after_inherited_acl_applied
+    t5=$?
+    subtest "on inherited acls" $t5
+    
+    alltrue $t1 $t2 $t3 $t4 $t5
 }
 
 clean () {

@@ -11,10 +11,10 @@ can-copy () {
 version () {
     ls -l $pax
     echo
-    echo "command = cd src; sudo $pax -rw $flags . dst"
+    echo "command = cd src; sudo $pax -rw -pe $flags . dst"
 }
 
 backup () {
     cd $1
-    sudo $pax -rw $flags . $2
+    sudo $pax -rw -pe $flags . $2
 }

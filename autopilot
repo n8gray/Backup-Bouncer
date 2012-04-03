@@ -9,10 +9,11 @@ echo "We're now going to create two disk images, create some files on one,"
 echo "copy them to the other, and find out what metadata was preserved."
 echo
 
-set -ex
+set -x
 
 make
 ./bbouncer create-vol Src
 ./bbouncer create-vol Dst
 ./bbouncer create /Volumes/Src
 ./bbouncer copy -d /Volumes/Src /Volumes/Dst
+#./bbouncer copy -c 16-rsync-fink -t 00-basic-permissions -d /Volumes/Src /Volumes/Dst

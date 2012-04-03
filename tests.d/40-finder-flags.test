@@ -45,7 +45,6 @@ max_priority () {
 
 create () {
     cd $1
-    set -e
     
     touch type-and-creator
     SetFile -c MSWD -t TEXT type-and-creator
@@ -67,6 +66,11 @@ create () {
     touch mucho-flags-file
     SetFile -a ABCDEIMNSTVZ mucho-flags-file
     
+    # Use every flag possible (then lock it)
+    touch mucho-flags-file-locked
+    SetFile -a ABCDEIMNSTVZ mucho-flags-file-locked
+    chflags uchg mucho-flags-file-locked
+    
     # All possible on a dir
     mkdir mucho-flags-dir
     SetFile -a CDEIVZ mucho-flags-dir
@@ -75,18 +79,10 @@ create () {
 compare () {
     test "`GetFileInfo -P -a $1`" = "`GetFileInfo -P -a $2`" \
     && test "`GetFileInfo -P -m $1`" = "`GetFileInfo -P -m $2`"
-    x=$?
-    if [ -f "$1" ]; then
-        test "`GetFileInfo -P -t $1`" = "`GetFileInfo -P -t $2`" \
-        && test "`GetFileInfo -P -c $1`" = "`GetFileInfo -P -c $2`"
-        x2=$?
-    elif [ -d "$1" ]; then
-        x2=0
-    else
-        echo "ERROR: Unknown file type in 40-finder-flags compare test"
-        x2=1
-    fi
-    alltrue $x $x2
+    if [ ! -d $1 ]; then
+	    test "`GetFileInfo -P -t $1`" = "`GetFileInfo -P -t $2`" \
+	    && test "`GetFileInfo -P -c $1`" = "`GetFileInfo -P -c $2`"
+	fi
 }
 
 verify () {
@@ -99,6 +95,7 @@ verify () {
     && test "`GetFileInfo -ae hidden-extension.txt`" = "1" \
     && test "`GetFileInfo -as system-file`" = "1" \
     && compare ./mucho-flags-file $2/mucho-flags-file \
+    && compare ./mucho-flags-file-locked $2/mucho-flags-file-locked \
     && compare ./mucho-flags-dir $2/mucho-flags-dir
 }
 

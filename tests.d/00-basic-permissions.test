@@ -14,7 +14,16 @@ create () {
     
     touch owned-by-me
     chmod 1777 owned-by-me
+
+    touch owned-by-me-suid
+    chmod u+s owned-by-me-suid
+
+    touch owned-by-me-guid
+    chmod g+s owned-by-me-guid
     
+    touch owned-by-me-sticky
+    chmod o+t owned-by-me-sticky
+
     touch owned-by-root
     sudo chown root:wheel owned-by-root
     
@@ -51,6 +60,9 @@ verify () {
     cd $1
     
     compare ./owned-by-me $2/owned-by-me \
+    && compare ./owned-by-me-suid $2/owned-by-me-suid \
+    && compare ./owned-by-me-guid $2/owned-by-me-guid \
+    && compare ./owned-by-me-sticky $2/owned-by-me-sticky \
     && compare ./owned-by-root $2/owned-by-root \
     && compare ./owned-by-www $2/owned-by-www \
     && compare ./some-dir $2/some-dir

@@ -33,7 +33,6 @@ max_priority () {
 
 create () {
     cd $1
-    set -e
     
     mkdir dir-with-flags
     chflags uappnd,uchg,nodump,opaque dir-with-flags

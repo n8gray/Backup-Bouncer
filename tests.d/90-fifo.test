@@ -6,7 +6,6 @@ max_priority () {
 
 create () {
     cd $1
-    set -e
     
     mkfifo some-fifo
 }

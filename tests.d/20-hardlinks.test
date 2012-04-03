@@ -10,7 +10,10 @@ create () {
     ln ./some-file link1
     ln ./some-file link2
     ln ./link1 link3
-    
+
+    touch locked_link_source
+	ln locked_link_source locked_link_target
+	chflags uchg locked_link_source
     # Leopard allows hard links to directories
     # mkdir dir1
     # mkdir dir2
@@ -21,13 +24,14 @@ create () {
 verify () {
     cd $1
     tmpfile=/tmp/hardlinks-test
-    set +e
     #begin-subtests
 
     stat -f "%i" link1 > $tmpfile
     stat -f "%i" link2 >> $tmpfile
     stat -f "%i" link3 >> $tmpfile
-    test "`uniq $tmpfile | wc -l | awk '{print $1}'`" = "1"
+    stat -f "%i%f" locked_link_source >> $tmpfile
+    stat -f "%i%f" locked_link_target >> $tmpfile
+    test "`uniq $tmpfile | wc -l | awk '{print $1}'`" = "2"
     #x1=$?
     #subtest "on files" $x1
     
