@@ -5,21 +5,22 @@ max_priority () {
 }
 
 create () {
-    cd $1
-    set -e
-    echo "testing 1 2 3" > some-file
-    echo "Hello world" > some-file/..namedfork/rsrc
+    echo "testing 1 2 3" > $1/some-file
+    xattr-util w com.apple.ResourceFork "Hello world" $1/some-file
     
-    echo "Apple's rsync had issues with resource forks + hardlinks" > hl-rfork1
-    ln hl-rfork1 hl-rfork2
-    echo "Let's see what happens..." > hl-rfork1/..namedfork/rsrc
+    echo "Apple's rsync had issues with resource forks + hardlinks" > $1/hl-rfork1
+    ln $1/hl-rfork1 $1/hl-rfork2
+    xattr-util w com.apple.ResourceFork "Let's see what happens..." $1/hl-rfork1
+
+	# Resource forks > 64MB have to be handled specially
+	echo "big daddy" > $1/large_resource_fork
+    dd if=/dev/random of="$1/large_resource_fork"/..namedfork/rsrc bs=1000000 count=75
 }
 
 compare () {
-    set -e
     # We only test regular files.  Should we test others?
     if [ -f "$1" ]; then
-        cmp "$1/..namedfork/rsrc" "$2/..namedfork/rsrc"
+		cmp "$1"/..namedfork/rsrc "$2"/..namedfork/rsrc
     else
         true
     fi
@@ -36,7 +37,7 @@ verify () {
     
     test -e ./some-file \
         && grep -q '^testing 1 2 3$' ./some-file \
-        && grep -q '^Hello world$' ./some-file/..namedfork/rsrc
+        && compare ./some-file $2/some-file
     x1=$?
     subtest "on files" $x1
     
@@ -49,7 +50,18 @@ verify () {
     x2=$?
     subtest "on hardlinked files" $x2
     
-    alltrue $x1 $x2
+    test_priority=$Important
+    test -e ./large_resource_fork \
+         && compare ./large_resource_fork $2/large_resource_fork
+    x3=$?
+    subtest "with forks > 64MB" $x3
+
+
+    # Truncate this file in the interests of space:
+    rm -f $1/large_resource_fork $1/._large_resource_fork
+    echo got result $x3 for this > $1/large_resource_fork
+    
+    alltrue $x1 $x2 $x3
 }
 
 clean () {

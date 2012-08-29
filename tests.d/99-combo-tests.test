@@ -6,7 +6,6 @@ max_priority () {
 
 create () {
     cd $1
-    set -e
     
     touch xattr-with-rfork
     echo "I love pancakes so much" > xattr-with-rfork/..namedfork/rsrc
@@ -46,7 +45,9 @@ create () {
 compare-xattrs () {
     test -e $1 && \
         test -e $2 && \
-        test "`xattr-util l $1`" = "`xattr-util l $2`" \
+		# The order in which the xattrs are listed is not guaranteed to be identical
+		# across filesystems, so we sort the list before comparing to avoid false negatives
+        test "`xattr-util l $1 | sort`" = "`xattr-util l $2 | sort`" \
         || return 1
     for a in `xattr-util l $1`; do
         test "`xattr-util r $a $1`" = "`xattr-util r $a $2`" || return 1
@@ -64,7 +65,6 @@ compare-acls () {
 }
 
 compare-stats () {
-    test -e $1
     test -e $2
     test "`stat -f '%u:%g:%p' $1`" = "`stat -f '%u:%g:%p' $2`"
 }

@@ -2,6 +2,10 @@ all:
 	cd util && make
 clean:
 	cd util && make clean
+realclean:
+	-umount /Volumes/Src
+	-umount /Volumes/Dst
+	-rm -f Src.sparseimage Dst.sparseimage
 #
 # Developer targets.  To use this:
 # 1. Change ./VERSION to reflect the release version

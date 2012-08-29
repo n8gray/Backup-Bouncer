@@ -5,7 +5,6 @@ max_priority () {
 
 create () {
     cd $1
-    set -e
     
     sudo mknod devzero c 3 3
     sudo mknod devvn0 b 1 0
