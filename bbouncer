@@ -304,11 +304,11 @@ done
 
 case $verb in
     create|create-vol|clean)
-        $verb $1
+        $verb "$1"
     ;;
     verify|copy|compare)
         [ "$#" -lt "2" ] && usage
-        $verb $1 $2
+        $verb "$1" "$2"
     ;;
     *) 
         usage
