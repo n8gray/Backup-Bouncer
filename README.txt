@@ -42,7 +42,7 @@ You can now run "bbouncer" with no arguments for usage info.  Or, you can run
 the results.  Also take a look in the scripts directory for scripts you can use
 to test tools that can't be run in the normal test suite for whatever reason.
 
-Note that many of the tests and all of the copiers require root priveleges.  
+Note that many of the tests and all of the copiers require root privileges.  
 They run using sudo, so you'll be prompted for your password.  This also means
 you need to run the suite as a member of the admin group.
 
