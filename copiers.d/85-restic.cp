@@ -1,6 +1,6 @@
 #!/bin/sh
 
-restic=/Users/MacLemon/bin/restic
+restic=$HOME/bin/restic
 
 # flags="-aH -E --rsync-path=$rsync"
 # This should resemble what we use with mlbackup as closely as possible.
