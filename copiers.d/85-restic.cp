@@ -33,7 +33,6 @@ backup () {
     echo Move files where BackupBouncer expects them for checks
     mv /Volumes/Dst/85-restic/Src/* /Volumes/Dst/85-restic/
     echo clean up temp directory
-    rm -r "restictempdir"
     unset RESTIC_PASSWORD
     return $returnvalue
 }
